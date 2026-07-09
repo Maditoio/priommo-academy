@@ -1,0 +1,15 @@
+---
+description: Always commit and push to GitHub after code changes to trigger Vercel deploy
+alwaysApply: true
+---
+
+# Deploy after every change
+
+After completing any code change in this project:
+
+1. Run `npm run build` and fix failures before deploying.
+2. Commit with a clear message describing why the change was made.
+3. Push to `origin/main` on `https://github.com/Maditoio/priommo-academy.git`.
+4. Tell the user the commit hash and that Vercel is deploying.
+
+Do not wait for the user to ask to deploy. Skip only if there are no file changes to commit, or if the user explicitly says not to deploy.
