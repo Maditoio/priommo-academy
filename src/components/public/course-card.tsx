@@ -32,30 +32,30 @@ export function CourseCard({ course, locale, enrollLabel, levelLabel, freeLabel 
   const isFree = price === 0;
 
   return (
-    <Card className="flex flex-col overflow-hidden transition-shadow hover:shadow-md">
-      <div className="relative aspect-[16/9] bg-muted">
+    <Card className="flex flex-col overflow-hidden transition-colors hover:border-navy/25">
+      <div className="relative aspect-[16/9] bg-navy/5">
         {course.imageUrl ? (
           <Image src={course.imageUrl} alt={title} fill className="object-cover" />
         ) : (
           <div className="flex h-full items-center justify-center">
-            <BookOpen className="h-12 w-12 text-muted-foreground/40" />
+            <BookOpen className="h-12 w-12 text-navy/20" />
           </div>
         )}
-        <Badge className="absolute left-3 top-3" variant="secondary">
-          {levelLabel}: {course.level}
+        <Badge variant="level" className="absolute left-3 top-3">
+          {course.level}
         </Badge>
       </div>
       <CardHeader className="pb-2">
         <CardTitle className="line-clamp-2 text-lg">{title}</CardTitle>
       </CardHeader>
       <CardContent className="flex-1">
-        <p className="line-clamp-3 text-sm text-muted-foreground">{description}</p>
+        <p className="line-clamp-3 text-sm text-ink-muted">{description}</p>
       </CardContent>
-      <CardFooter className="flex items-center justify-between border-t pt-4">
-        <span className="text-lg font-semibold text-primary">
+      <CardFooter className="flex items-center justify-between border-t border-navy/10 pt-4">
+        <span className="font-display text-lg font-semibold text-navy">
           {isFree ? freeLabel : formatPrice(price, course.currency, locale)}
         </span>
-        <Button asChild size="sm">
+        <Button asChild size="sm" variant="outline">
           <Link href={`/courses/${course.slug}`}>{enrollLabel}</Link>
         </Button>
       </CardFooter>

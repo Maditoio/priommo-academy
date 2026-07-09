@@ -49,7 +49,7 @@ export default async function AdminEnrollmentDetailPage({
 
   return (
     <AdminShell labels={labels} currentPath="/admin/enrollments">
-      <h1 className="text-2xl font-bold">{enrollment.user.name}</h1>
+      <h1 className="font-display text-3xl font-semibold tracking-tight text-navy">{enrollment.user.name}</h1>
       <p className="text-muted-foreground">{enrollment.course.titleFr}</p>
 
       <div className="mt-6 grid gap-4 sm:grid-cols-3">
@@ -61,7 +61,7 @@ export default async function AdminEnrollmentDetailPage({
         </Card>
         <Card>
           <CardHeader><CardTitle className="text-sm">Progress</CardTitle></CardHeader>
-          <CardContent><p className="text-2xl font-bold">{enrollment.progressPct}%</p></CardContent>
+          <CardContent><p className="font-display text-3xl font-semibold tracking-tight text-navy">{enrollment.progressPct}%</p></CardContent>
         </Card>
         <Card>
           <CardHeader><CardTitle className="text-sm">Enrolled</CardTitle></CardHeader>

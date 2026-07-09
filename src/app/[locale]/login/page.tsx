@@ -63,9 +63,9 @@ function LoginForm() {
             {loading ? "..." : t("loginButton")}
           </Button>
         </form>
-        <p className="mt-4 text-center text-sm text-muted-foreground">
+        <p className="mt-4 text-center text-sm text-ink-muted">
           {t("noAccount")}{" "}
-          <Link href="/register" className="font-medium text-primary hover:underline">
+          <Link href="/register" className="font-medium text-navy hover:underline">
             {t("registerButton")}
           </Link>
         </p>
@@ -77,7 +77,7 @@ function LoginForm() {
 export default function LoginPage() {
   return (
     <div className="flex min-h-[60vh] items-center justify-center px-6 py-12">
-      <Suspense fallback={<div className="h-64 w-full max-w-md animate-pulse rounded-lg bg-muted" />}>
+      <Suspense fallback={<div className="h-64 w-full max-w-md animate-pulse rounded-[12px] border border-navy/10 bg-navy/5" />}>
         <LoginForm />
       </Suspense>
     </div>

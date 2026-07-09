@@ -4,6 +4,7 @@ import { AdminShell } from "@/components/admin/admin-shell";
 import { DataTable } from "@/components/admin/data-table";
 import { Pagination } from "@/components/admin/pagination";
 import { RevokeCertificateButton } from "@/components/admin/revoke-certificate-button";
+import { VerificationSeal, sealStatusFromCertificate } from "@/components/public/verification-seal";
 import { StatusBadge } from "@/components/public/status-badge";
 import { Link } from "@/i18n/routing";
 import { getTranslations, setRequestLocale } from "next-intl/server";
@@ -60,11 +61,19 @@ export default async function AdminCertificatesPage({
 
   return (
     <AdminShell labels={labels} currentPath="/admin/certificates">
-      <h1 className="text-2xl font-bold">{ta("certificates")}</h1>
+      <h1 className="font-display text-3xl font-semibold tracking-tight text-navy">{ta("certificates")}</h1>
       <div className="mt-6">
         <DataTable
           columns={[
-            { key: "code", header: "Code", cell: (r) => r.uniqueCode },
+            { key: "code", header: "Code", cell: (r) => (
+              <div className="flex items-center gap-3">
+                <VerificationSeal
+                  status={sealStatusFromCertificate(r.status)}
+                  code={r.uniqueCode}
+                  size="sm"
+                />
+              </div>
+            ) },
             { key: "user", header: ta("users"), cell: (r) => r.user.name },
             { key: "cert", header: ta("certifications"), cell: (r) => r.certification.titleFr },
             {

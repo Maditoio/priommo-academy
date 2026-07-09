@@ -50,7 +50,7 @@ export default async function AdminOrganizationsPage({
 
   return (
     <AdminShell labels={labels} currentPath="/admin/organizations">
-      <h1 className="text-2xl font-bold">{ta("organizations")}</h1>
+      <h1 className="font-display text-3xl font-semibold tracking-tight text-navy">{ta("organizations")}</h1>
 
       <Card className="mt-6">
         <CardContent className="pt-6">

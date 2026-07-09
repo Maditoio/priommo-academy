@@ -43,7 +43,7 @@ export default async function EditCertificationPage({
 
   return (
     <AdminShell labels={labels} currentPath="/admin/certifications">
-      <h1 className="text-2xl font-bold">{certification.titleFr}</h1>
+      <h1 className="font-display text-3xl font-semibold tracking-tight text-navy">{certification.titleFr}</h1>
       <Card className="mt-6">
         <CardContent className="pt-6">
           <form action={updateCertification.bind(null, id)} className="space-y-6">

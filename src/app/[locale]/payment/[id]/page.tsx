@@ -45,7 +45,7 @@ export default async function PaymentPage({
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="rounded-lg bg-muted p-4 text-center">
-            <p className="text-2xl font-bold">
+            <p className="font-display text-3xl font-semibold tracking-tight text-navy">
               {formatPrice(payment.amount.toString(), payment.currency, locale)}
             </p>
             {course && (

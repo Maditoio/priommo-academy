@@ -2,7 +2,8 @@ import { Link } from "@/i18n/routing";
 import { auth, signOut } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { LanguageSwitcher } from "@/components/public/language-switcher";
-import { GraduationCap } from "lucide-react";
+import { NavLinks } from "@/components/public/nav-links";
+import { Award } from "lucide-react";
 
 interface HeaderProps {
   locale: string;
@@ -23,27 +24,21 @@ export async function Header({ locale, labels }: HeaderProps) {
   const session = await auth();
 
   return (
-    <header className="sticky top-0 z-50 border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80">
+    <header className="sticky top-0 z-50 bg-navy text-white">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6 lg:px-12">
-        <Link href="/" className="flex items-center gap-2 font-semibold text-primary">
-          <GraduationCap className="h-7 w-7" />
-          <span className="hidden sm:inline">{labels.appName}</span>
+        <Link href="/" className="flex items-center gap-2.5">
+          <div className="flex h-9 w-9 items-center justify-center rounded-full border border-gold/40 bg-navy-light">
+            <Award className="h-5 w-5 text-gold" />
+          </div>
+          <span className="font-display hidden text-lg font-semibold tracking-tight sm:inline">
+            {labels.appName}
+          </span>
         </Link>
 
-        <nav className="hidden items-center gap-6 md:flex">
-          <Link href="/courses" className="text-sm font-medium text-muted-foreground hover:text-foreground">
-            {labels.courses}
-          </Link>
-          <Link
-            href="/certifications"
-            className="text-sm font-medium text-muted-foreground hover:text-foreground"
-          >
-            {labels.certifications}
-          </Link>
-        </nav>
+        <NavLinks courses={labels.courses} certifications={labels.certifications} />
 
         <div className="flex items-center gap-2">
-          <LanguageSwitcher />
+          <LanguageSwitcher dark />
           {session?.user ? (
             <>
               {session.user.role === "ADMIN" && (
@@ -60,7 +55,7 @@ export async function Header({ locale, labels }: HeaderProps) {
                   await signOut({ redirectTo: `/${locale}` });
                 }}
               >
-                <Button type="submit" variant="outline" size="sm">
+                <Button type="submit" variant="outline" size="sm" className="border-white/30 text-white hover:bg-white/10">
                   {labels.logout}
                 </Button>
               </form>
@@ -70,7 +65,7 @@ export async function Header({ locale, labels }: HeaderProps) {
               <Button asChild variant="ghost" size="sm">
                 <Link href="/login">{labels.login}</Link>
               </Button>
-              <Button asChild size="sm">
+              <Button asChild variant="gold" size="sm">
                 <Link href="/register">{labels.register}</Link>
               </Button>
             </>

@@ -32,21 +32,29 @@ export default async function HomePage({
 
   return (
     <>
-      <section className="border-b bg-white">
-        <div className="mx-auto max-w-7xl px-6 py-20 lg:px-12 lg:py-28">
+      <section className="hero-gradient text-white">
+        <div className="mx-auto max-w-7xl px-6 py-20 lg:px-12 lg:py-32">
           <div className="max-w-2xl">
-            <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
+            <p className="text-sm font-medium uppercase tracking-widest text-gold-light">
+              PROIMMO Academy
+            </p>
+            <h1 className="font-display mt-4 text-4xl font-semibold tracking-tight sm:text-5xl lg:text-[3.5rem] lg:leading-[1.1]">
               {t("heroTitle")}
             </h1>
-            <p className="mt-6 text-lg text-muted-foreground">{t("heroSubtitle")}</p>
-            <div className="mt-8 flex flex-wrap gap-4">
-              <Button asChild size="lg">
+            <p className="mt-6 text-lg text-white/80">{t("heroSubtitle")}</p>
+            <div className="mt-10 flex flex-wrap gap-4">
+              <Button asChild size="lg" variant="gold">
                 <Link href="/courses">
                   {t("ctaCourses")}
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
-              <Button asChild variant="outline" size="lg">
+              <Button
+                asChild
+                size="lg"
+                variant="outline"
+                className="border-white/40 text-white hover:bg-white/10"
+              >
                 <Link href="/certifications">{t("ctaCertifications")}</Link>
               </Button>
             </div>
@@ -56,9 +64,11 @@ export default async function HomePage({
 
       <section className="py-16 lg:py-24">
         <div className="mx-auto max-w-7xl px-6 lg:px-12">
-          <h2 className="text-2xl font-bold sm:text-3xl">{t("featuredCourses")}</h2>
+          <h2 className="font-display text-3xl font-semibold tracking-tight text-navy sm:text-4xl">
+            {t("featuredCourses")}
+          </h2>
           {featuredCourses.length > 0 ? (
-            <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {featuredCourses.map((course) => (
                 <CourseCard
                   key={course.id}
@@ -71,24 +81,26 @@ export default async function HomePage({
               ))}
             </div>
           ) : (
-            <p className="mt-8 text-muted-foreground">{tc("noCourses")}</p>
+            <p className="mt-10 text-ink-muted">{tc("noCourses")}</p>
           )}
         </div>
       </section>
 
-      <section className="border-t bg-white py-16 lg:py-24">
+      <section className="border-t border-navy/10 py-16 lg:py-24">
         <div className="mx-auto max-w-7xl px-6 lg:px-12">
-          <h2 className="text-2xl font-bold sm:text-3xl">{t("howItWorks")}</h2>
-          <div className="mt-12 grid gap-8 md:grid-cols-3">
+          <h2 className="font-display text-3xl font-semibold tracking-tight text-navy">
+            {t("howItWorks")}
+          </h2>
+          <div className="mt-12 grid gap-10 md:grid-cols-3">
             {steps.map((step, i) => {
               const Icon = step.icon;
               return (
                 <div key={i} className="flex flex-col">
-                  <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-accent">
-                    <Icon className="h-6 w-6 text-primary" />
+                  <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg border border-gold/30 bg-gold/5">
+                    <Icon className="h-6 w-6 text-gold" />
                   </div>
-                  <h3 className="text-lg font-semibold">{step.title}</h3>
-                  <p className="mt-2 text-muted-foreground">{step.desc}</p>
+                  <h3 className="font-display text-xl font-semibold text-navy">{step.title}</h3>
+                  <p className="mt-2 text-ink-muted">{step.desc}</p>
                 </div>
               );
             })}

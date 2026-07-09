@@ -52,7 +52,7 @@ export default async function AdminPaymentsPage({
 
   return (
     <AdminShell labels={labels} currentPath="/admin/payments">
-      <h1 className="text-2xl font-bold">{ta("payments")}</h1>
+      <h1 className="font-display text-3xl font-semibold tracking-tight text-navy">{ta("payments")}</h1>
       <div className="mt-6">
         <DataTable
           columns={[

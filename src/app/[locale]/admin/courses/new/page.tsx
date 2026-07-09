@@ -36,7 +36,7 @@ export default async function NewCoursePage({
 
   return (
     <AdminShell labels={labels} currentPath="/admin/courses">
-      <h1 className="text-2xl font-bold">{ta("createCourse")}</h1>
+      <h1 className="font-display text-3xl font-semibold tracking-tight text-navy">{ta("createCourse")}</h1>
       <Card className="mt-6">
         <CardHeader>
           <CardTitle>{ta("courses")}</CardTitle>

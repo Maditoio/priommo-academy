@@ -30,27 +30,29 @@ interface AdminShellProps {
 
 export function AdminShell({ children, labels, currentPath }: AdminShellProps) {
   return (
-    <div className="flex min-h-screen bg-muted/30">
-      <aside className="hidden w-64 shrink-0 border-r bg-white lg:block">
-        <div className="flex h-16 items-center border-b px-6">
-          <span className="font-semibold text-primary">{labels.title}</span>
+    <div className="flex min-h-screen bg-paper">
+      <aside className="hidden w-64 shrink-0 border-r border-navy/10 bg-navy lg:block">
+        <div className="flex h-16 items-center border-b border-white/10 px-6">
+          <span className="font-display font-semibold text-white">{labels.title}</span>
         </div>
-        <nav className="space-y-1 p-4">
+        <nav className="space-y-0.5 p-3">
           {navItems.map((item) => {
             const Icon = item.icon;
-            const isActive = currentPath === item.href || (item.href !== "/admin" && currentPath.startsWith(item.href));
+            const isActive =
+              currentPath === item.href ||
+              (item.href !== "/admin" && currentPath.startsWith(item.href));
             return (
               <Link
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+                  "relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
                   isActive
-                    ? "bg-accent text-accent-foreground"
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                    ? "bg-navy-light text-white after:absolute after:bottom-1 after:left-3 after:right-3 after:h-0.5 after:bg-gold"
+                    : "text-white/70 hover:bg-navy-light/50 hover:text-white"
                 )}
               >
-                <Icon className="h-4 w-4" />
+                <Icon className="h-4 w-4 shrink-0" />
                 {labels[item.labelKey]}
               </Link>
             );

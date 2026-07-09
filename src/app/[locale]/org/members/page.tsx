@@ -23,7 +23,7 @@ export default async function OrgMembersPage({
   return (
     <div className="py-12">
       <div className="mx-auto max-w-7xl px-6 lg:px-12">
-        <h1 className="text-2xl font-bold">Team members</h1>
+        <h1 className="font-display text-3xl font-semibold tracking-tight text-navy">Team members</h1>
         <p className="mt-2 text-muted-foreground">Post-MVP scaffold</p>
         <ul className="mt-6 space-y-2">
           {user?.organization?.members.map((m) => (

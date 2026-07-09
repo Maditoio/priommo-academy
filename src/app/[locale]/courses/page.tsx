@@ -96,8 +96,8 @@ export default async function CoursesPage({
     <div className="py-12 lg:py-16">
       <div className="mx-auto max-w-7xl px-6 lg:px-12">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold">{t("title")}</h1>
-          <p className="mt-2 text-muted-foreground">{t("subtitle")}</p>
+          <h1 className="font-display text-4xl font-semibold tracking-tight text-navy">{t("title")}</h1>
+          <p className="mt-2 text-ink-muted">{t("subtitle")}</p>
         </div>
 
         <Suspense>

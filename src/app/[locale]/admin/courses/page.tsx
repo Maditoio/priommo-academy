@@ -63,7 +63,7 @@ export default async function AdminCoursesPage({
   return (
     <AdminShell labels={labels} currentPath="/admin/courses">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">{ta("courses")}</h1>
+        <h1 className="font-display text-3xl font-semibold tracking-tight text-navy">{ta("courses")}</h1>
         <Button asChild>
           <Link href="/admin/courses/new">
             <Plus className="mr-2 h-4 w-4" />

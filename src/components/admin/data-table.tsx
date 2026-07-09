@@ -23,17 +23,17 @@ interface DataTableProps<T> {
 export function DataTable<T extends { id: string }>({ columns, data, emptyMessage }: DataTableProps<T>) {
   if (data.length === 0) {
     return (
-      <div className="rounded-lg border bg-white p-12 text-center text-muted-foreground">
+      <div className="rounded-[12px] border border-navy/10 bg-paper p-12 text-center text-ink-muted">
         {emptyMessage ?? "No data"}
       </div>
     );
   }
 
   return (
-    <div className="rounded-lg border bg-white">
+    <div className="overflow-hidden rounded-[12px] border border-navy/10 bg-paper">
       <Table>
         <TableHeader>
-          <TableRow>
+          <TableRow className="border-navy/10 hover:bg-transparent">
             {columns.map((col) => (
               <TableHead key={col.key} className={col.className}>
                 {col.header}
@@ -43,7 +43,7 @@ export function DataTable<T extends { id: string }>({ columns, data, emptyMessag
         </TableHeader>
         <TableBody>
           {data.map((row) => (
-            <TableRow key={row.id}>
+            <TableRow key={row.id} className="border-navy/10 hover:bg-navy/[0.02]">
               {columns.map((col) => (
                 <TableCell key={col.key} className={col.className}>
                   {col.cell(row)}

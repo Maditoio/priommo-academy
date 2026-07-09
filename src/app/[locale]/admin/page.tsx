@@ -41,20 +41,20 @@ export default async function AdminOverviewPage({
     <AdminShell labels={{ title: ta("title"), ...Object.fromEntries(
       ["overview", "courses", "certifications", "enrollments", "certificates", "users", "organizations", "payments"].map(k => [k, ta(k as "overview")])
     ) }} currentPath="/admin">
-      <h1 className="text-2xl font-bold">{ta("overview")}</h1>
+      <h1 className="font-display text-3xl font-semibold tracking-tight text-navy">{ta("overview")}</h1>
       <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat) => {
           const Icon = stat.icon;
           return (
             <Card key={stat.label}>
               <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
+                <CardTitle className="text-sm font-medium text-ink-muted">
                   {stat.label}
                 </CardTitle>
-                <Icon className="h-4 w-4 text-muted-foreground" />
+                <Icon className="h-4 w-4 text-gold" />
               </CardHeader>
               <CardContent>
-                <p className="text-2xl font-bold">{stat.value}</p>
+                <p className="font-display text-3xl font-semibold text-navy">{stat.value}</p>
               </CardContent>
             </Card>
           );

@@ -26,13 +26,13 @@ export default async function OrgOverviewPage({
   return (
     <div className="py-12">
       <div className="mx-auto max-w-7xl px-6 lg:px-12">
-        <h1 className="text-2xl font-bold">B2B — {user?.organization?.name ?? "Organization"}</h1>
+        <h1 className="font-display text-3xl font-semibold tracking-tight text-navy">B2B — {user?.organization?.name ?? "Organization"}</h1>
         <p className="mt-2 text-muted-foreground">Post-MVP scaffold</p>
         <div className="mt-8 grid gap-4 sm:grid-cols-3">
           <Card>
             <CardHeader><CardTitle className="text-sm">Seats</CardTitle></CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold">
+              <p className="font-display text-3xl font-semibold tracking-tight text-navy">
                 {user?.organization?._count.members ?? 0} / {user?.organization?.seats ?? 0}
               </p>
             </CardContent>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -65,7 +65,9 @@ export function CourseFilters({
           ))}
         </SelectContent>
       </Select>
-      <Button onClick={applyFilters}>OK</Button>
+      <Button onClick={applyFilters} variant="default">
+        OK
+      </Button>
     </div>
   );
 }

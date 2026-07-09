@@ -35,7 +35,7 @@ export default async function NewCertificationPage({
 
   return (
     <AdminShell labels={labels} currentPath="/admin/certifications">
-      <h1 className="text-2xl font-bold">{ta("createCertification")}</h1>
+      <h1 className="font-display text-3xl font-semibold tracking-tight text-navy">{ta("createCertification")}</h1>
       <Card className="mt-6">
         <CardContent className="pt-6">
           <form action={createCertification} className="space-y-6">

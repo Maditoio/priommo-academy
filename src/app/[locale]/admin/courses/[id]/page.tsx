@@ -54,7 +54,7 @@ export default async function EditCoursePage({
   return (
     <AdminShell labels={labels} currentPath="/admin/courses">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">{course.titleFr}</h1>
+        <h1 className="font-display text-3xl font-semibold tracking-tight text-navy">{course.titleFr}</h1>
         <StatusBadge
           status={course.published ? "PUBLISHED" : "DRAFT"}
           label={course.published ? tc("published") : tc("draft")}

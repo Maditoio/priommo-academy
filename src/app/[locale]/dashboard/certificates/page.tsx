@@ -1,15 +1,18 @@
 import { db } from "@/lib/db";
 import { auth } from "@/lib/auth";
-import { generateCertificateQR } from "@/lib/qr";
 import { localizedField } from "@/lib/utils";
+import {
+  VerificationSeal,
+  sealStatusFromCertificate,
+} from "@/components/public/verification-seal";
 import { StatusBadge } from "@/components/public/status-badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/routing";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { format } from "date-fns";
 import { fr, enUS } from "date-fns/locale";
-import Image from "next/image";
 
 export default async function CertificatesPage({
   params,
@@ -32,52 +35,43 @@ export default async function CertificatesPage({
     orderBy: { issuedAt: "desc" },
   });
 
-  const certsWithQr = await Promise.all(
-    certificates.map(async (cert) => ({
-      ...cert,
-      qrDataUrl: await generateCertificateQR(cert.uniqueCode),
-    }))
-  );
-
   return (
     <div className="py-12 lg:py-16">
       <div className="mx-auto max-w-7xl px-6 lg:px-12">
-        <Link href="/dashboard" className="text-sm text-primary hover:underline">
+        <Link href="/dashboard" className="text-sm text-navy hover:underline">
           ← {t("title")}
         </Link>
-        <h1 className="mt-4 text-3xl font-bold">{t("myCertificates")}</h1>
+        <h1 className="font-display mt-4 text-4xl font-semibold tracking-tight text-navy">
+          {t("myCertificates")}
+        </h1>
 
-        {certsWithQr.length > 0 ? (
-          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {certsWithQr.map((cert) => (
+        {certificates.length > 0 ? (
+          <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {certificates.map((cert) => (
               <Card key={cert.id}>
-                <CardContent className="pt-6 text-center">
-                  <Image
-                    src={cert.qrDataUrl}
-                    alt="QR"
-                    width={160}
-                    height={160}
-                    className="mx-auto"
+                <CardContent className="flex flex-col items-center pt-8 text-center">
+                  <VerificationSeal
+                    status={sealStatusFromCertificate(cert.status)}
+                    code={cert.uniqueCode}
+                    level={cert.certification.level}
+                    size="md"
                   />
-                  <p className="mt-4 font-medium">
+                  <p className="mt-6 font-display font-semibold text-navy">
                     {localizedField(cert.certification, "title", locale)}
                   </p>
                   <StatusBadge status={cert.status} label={ts(cert.status)} className="mt-2" />
-                  <p className="mt-2 text-sm text-muted-foreground">
+                  <p className="mt-2 text-sm text-ink-muted">
                     {format(cert.issuedAt, "PP", { locale: dateLocale })}
                   </p>
-                  <Link
-                    href={`/verify/${cert.uniqueCode}`}
-                    className="mt-4 inline-block text-sm font-medium text-primary hover:underline"
-                  >
-                    {t("viewCertificate")}
-                  </Link>
+                  <Button asChild size="sm" variant="outline" className="mt-4 w-full">
+                    <Link href={`/verify/${cert.uniqueCode}`}>{t("viewCertificate")}</Link>
+                  </Button>
                 </CardContent>
               </Card>
             ))}
           </div>
         ) : (
-          <p className="mt-8 text-muted-foreground">{t("noCertificates")}</p>
+          <p className="mt-10 text-ink-muted">{t("noCertificates")}</p>
         )}
       </div>
     </div>

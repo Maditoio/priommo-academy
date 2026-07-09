@@ -9,6 +9,7 @@ import { Separator } from "@/components/ui/separator";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import Image from "next/image";
+import { VerificationSeal } from "@/components/public/verification-seal";
 import { BookOpen, Clock } from "lucide-react";
 
 export default async function CourseDetailPage({
@@ -31,6 +32,7 @@ export default async function CourseDetailPage({
         include: { lessons: { orderBy: { order: "asc" } } },
       },
       exams: true,
+      certifications: { take: 1 },
     },
   });
 
@@ -56,24 +58,26 @@ export default async function CourseDetailPage({
       <div className="mx-auto max-w-7xl px-6 lg:px-12">
         <div className="grid gap-8 lg:grid-cols-3">
           <div className="lg:col-span-2">
-            <div className="relative mb-6 aspect-[21/9] overflow-hidden rounded-lg bg-muted">
+            <div className="relative mb-6 aspect-[21/9] overflow-hidden rounded-[12px] border border-navy/10 bg-navy/5">
               {course.imageUrl ? (
                 <Image src={course.imageUrl} alt={title} fill className="object-cover" />
               ) : (
                 <div className="flex h-full items-center justify-center">
-                  <BookOpen className="h-16 w-16 text-muted-foreground/40" />
+                  <BookOpen className="h-16 w-16 text-navy/20" />
                 </div>
               )}
             </div>
-            <Badge variant="secondary" className="mb-4">
-              {t("level")}: {course.level}
+            <Badge variant="level" className="mb-4">
+              {course.level}
             </Badge>
-            <h1 className="text-3xl font-bold lg:text-4xl">{title}</h1>
-            <p className="mt-4 text-lg text-muted-foreground">{description}</p>
+            <h1 className="font-display text-3xl font-semibold tracking-tight text-navy lg:text-4xl">
+              {title}
+            </h1>
+            <p className="mt-4 text-lg text-ink-muted">{description}</p>
 
             <Separator className="my-8" />
 
-            <h2 className="text-xl font-semibold">{t("curriculum")}</h2>
+            <h2 className="font-display text-xl font-semibold text-navy">{t("curriculum")}</h2>
             <div className="mt-4 space-y-4">
               {course.modules.map((mod) => (
                 <Card key={mod.id}>
@@ -85,7 +89,7 @@ export default async function CourseDetailPage({
                   <CardContent>
                     <ul className="space-y-2">
                       {mod.lessons.map((lesson) => (
-                        <li key={lesson.id} className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <li key={lesson.id} className="flex items-center gap-2 text-sm text-ink-muted">
                           <BookOpen className="h-4 w-4 shrink-0" />
                           {localizedField(lesson, "title", locale)}
                           {lesson.durationMin && (
@@ -106,10 +110,20 @@ export default async function CourseDetailPage({
           <div>
             <Card className="sticky top-24">
               <CardContent className="p-6">
-                <p className="text-3xl font-bold text-primary">
+                {course.certifications[0] && (
+                  <div className="mb-6 flex justify-center border-b border-navy/10 pb-6">
+                    <VerificationSeal
+                      status="valid"
+                      code="PREVIEW"
+                      level={course.certifications[0].level}
+                      size="sm"
+                    />
+                  </div>
+                )}
+                <p className="font-display text-3xl font-semibold text-navy">
                   {isFree ? tcommon("free") : formatPrice(price, course.currency, locale)}
                 </p>
-                <p className="mt-2 text-sm text-muted-foreground">
+                <p className="mt-2 text-sm text-ink-muted">
                   {course.modules.length} {t("modules")} · {totalLessons} {t("lessons")}
                 </p>
                 {session?.user ? (
@@ -124,13 +138,13 @@ export default async function CourseDetailPage({
                         await enrollInCourse(course.id, locale);
                       }}
                     >
-                      <Button type="submit" className="mt-6 w-full" size="lg">
+                      <Button type="submit" className="mt-6 w-full" size="lg" variant="gold">
                         {t("enroll")}
                       </Button>
                     </form>
                   )
                 ) : (
-                  <Button className="mt-6 w-full" size="lg" asChild>
+                  <Button className="mt-6 w-full" size="lg" variant="gold" asChild>
                     <a href={`/${locale}/login`}>{t("enroll")}</a>
                   </Button>
                 )}

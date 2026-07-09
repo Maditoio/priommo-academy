@@ -1,13 +1,12 @@
 "use client";
 
-import { useTranslations } from "next-intl";
 import { usePathname, useRouter } from "@/i18n/routing";
 import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Globe } from "lucide-react";
+import { cn } from "@/lib/utils";
 
-export function LanguageSwitcher() {
-  const t = useTranslations("nav");
+export function LanguageSwitcher({ dark = false }: { dark?: boolean }) {
   const router = useRouter();
   const pathname = usePathname();
   const params = useParams();
@@ -16,11 +15,11 @@ export function LanguageSwitcher() {
 
   return (
     <Button
-      variant="ghost"
+      variant={dark ? "ghost" : "ghostDark"}
       size="sm"
       onClick={() => router.replace(pathname, { locale: nextLocale })}
-      className="gap-1.5"
-      aria-label={t("home")}
+      className={cn("gap-1.5", !dark && "text-navy")}
+      aria-label="Switch language"
     >
       <Globe className="h-4 w-4" />
       {nextLocale.toUpperCase()}
