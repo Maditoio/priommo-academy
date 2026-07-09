@@ -1,7 +1,7 @@
 import createMiddleware from "next-intl/middleware";
+import { getToken } from "next-auth/jwt";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { auth } from "@/lib/auth";
 import { routing } from "@/i18n/routing";
 
 const intlMiddleware = createMiddleware(routing);
@@ -9,6 +9,8 @@ const intlMiddleware = createMiddleware(routing);
 const adminPaths = ["/admin"];
 const learnerPaths = ["/dashboard"];
 const orgPaths = ["/org"];
+
+type TokenRole = "LEARNER" | "ADMIN" | "ORG_ADMIN";
 
 export default async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -20,16 +22,23 @@ export default async function middleware(request: NextRequest) {
   const isOrgRoute = orgPaths.some((p) => pathWithoutLocale.startsWith(p));
 
   if (isAdminRoute || isLearnerRoute || isOrgRoute) {
-    const session = await auth();
-    if (!session?.user) {
+    const token = await getToken({
+      req: request,
+      secret: process.env.AUTH_SECRET,
+    });
+
+    if (!token) {
       const loginUrl = new URL(`/${locale}/login`, request.url);
       loginUrl.searchParams.set("callbackUrl", pathname);
       return NextResponse.redirect(loginUrl);
     }
-    if (isAdminRoute && session.user.role !== "ADMIN") {
+
+    const role = token.role as TokenRole | undefined;
+
+    if (isAdminRoute && role !== "ADMIN") {
       return NextResponse.redirect(new URL(`/${locale}/dashboard`, request.url));
     }
-    if (isOrgRoute && session.user.role !== "ORG_ADMIN" && session.user.role !== "ADMIN") {
+    if (isOrgRoute && role !== "ORG_ADMIN" && role !== "ADMIN") {
       return NextResponse.redirect(new URL(`/${locale}/dashboard`, request.url));
     }
   }
