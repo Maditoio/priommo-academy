@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { MaterialIcon } from "@/components/ui/material-icon";
 import { submitExamAnswers } from "@/actions/exams";
 import { localizedField } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 
 type Choice = { id: string; labelFr: string; labelEn: string };
 type Question = {
@@ -64,73 +65,119 @@ export function ExamTaker({ attemptId, locale, endsAt, questions, labels }: Exam
   const mins = Math.floor(remaining / 60000);
   const secs = Math.floor((remaining % 60000) / 1000);
   const q = questions[current];
+  const answeredCount = Object.keys(answers).length;
+  const urgent = remaining < 5 * 60 * 1000;
 
   return (
-    <div className="mx-auto max-w-2xl">
-      <div className="sticky top-16 z-40 mb-6 flex items-center justify-between rounded-xl bg-surface px-4 py-3 shadow-md">
-        <div className="flex items-center gap-2 text-sm font-medium text-ink">
-          <MaterialIcon name="timer" className="text-accent" size={20} />
-          {labels.timeRemaining}: {mins}:{secs.toString().padStart(2, "0")}
-        </div>
-        <span className="text-sm text-ink-muted">
-          {labels.question} {current + 1} {labels.of} {questions.length}
-        </span>
-      </div>
-
-      {q && (
-        <div className="rounded-2xl bg-surface p-6 shadow-md">
-          <p className="text-xs font-medium uppercase tracking-wide text-accent">
-            {locale === "fr" ? q.category.nameFr : q.category.nameEn}
+    <div className="flex min-h-[calc(100vh-4rem)] flex-col lg:min-h-screen lg:flex-row">
+      <aside className="border-b border-border bg-surface lg:w-72 lg:shrink-0 lg:border-b-0 lg:border-r">
+        <div className="flex items-center justify-between gap-4 px-5 py-4 lg:flex-col lg:items-stretch lg:gap-3">
+          <div
+            className={cn(
+              "flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold",
+              urgent ? "bg-danger/10 text-danger" : "bg-accent-soft text-accent"
+            )}
+          >
+            <MaterialIcon name="timer" size={20} />
+            {mins}:{secs.toString().padStart(2, "0")}
+          </div>
+          <p className="text-sm text-ink-muted">
+            {answeredCount}/{questions.length} {labels.question.toLowerCase()}s
           </p>
-          <h2 className="mt-2 text-lg font-semibold text-ink">
-            {localizedField(q, "prompt", locale)}
-          </h2>
-          <div className="mt-6 space-y-2">
-            {q.choices.map((choice) => (
-              <label
-                key={choice.id}
-                className={`flex cursor-pointer items-center gap-3 rounded-xl border px-4 py-3 transition-colors ${
-                  answers[q.id] === choice.id
-                    ? "border-accent bg-accent-soft"
-                    : "border-border hover:bg-surface-hover"
-                }`}
-              >
-                <input
-                  type="radio"
-                  name={q.id}
-                  value={choice.id}
-                  checked={answers[q.id] === choice.id}
-                  onChange={() => setAnswers((prev) => ({ ...prev, [q.id]: choice.id }))}
-                  className="accent-accent"
-                />
-                <span className="text-sm text-ink">
-                  {locale === "fr" ? choice.labelFr : choice.labelEn}
-                </span>
-              </label>
-            ))}
+        </div>
+        <div className="hidden max-h-[calc(100vh-8rem)] overflow-y-auto px-3 pb-4 lg:block">
+          <div className="grid grid-cols-5 gap-2">
+            {questions.map((question, i) => {
+              const answered = !!answers[question.id];
+              const active = i === current;
+              return (
+                <button
+                  key={question.id}
+                  type="button"
+                  onClick={() => setCurrent(i)}
+                  className={cn(
+                    "flex h-9 w-full items-center justify-center rounded-lg text-xs font-semibold transition-colors",
+                    active
+                      ? "bg-accent text-white"
+                      : answered
+                        ? "bg-success/15 text-success"
+                        : "bg-surface-hover text-ink-muted hover:text-ink"
+                  )}
+                >
+                  {i + 1}
+                </button>
+              );
+            })}
           </div>
         </div>
-      )}
+      </aside>
 
-      <div className="mt-6 flex justify-between gap-3">
-        <Button
-          type="button"
-          variant="secondary"
-          disabled={current === 0}
-          onClick={() => setCurrent((c) => c - 1)}
-        >
-          <MaterialIcon name="chevron_left" size={18} />
-        </Button>
-        {current < questions.length - 1 ? (
-          <Button type="button" onClick={() => setCurrent((c) => c + 1)}>
-            <MaterialIcon name="chevron_right" size={18} />
+      <div className="flex flex-1 flex-col">
+        <div className="border-b border-border bg-surface px-5 py-3 lg:px-8">
+          <p className="text-sm text-ink-muted">
+            {labels.question} {current + 1} {labels.of} {questions.length}
+          </p>
+        </div>
+
+        <div className="flex-1 overflow-y-auto px-5 py-6 lg:px-10 lg:py-8">
+          {q && (
+            <div className="mx-auto max-w-4xl">
+              <p className="text-xs font-semibold uppercase tracking-wide text-accent">
+                {locale === "fr" ? q.category.nameFr : q.category.nameEn}
+              </p>
+              <h2 className="mt-3 text-xl font-semibold leading-snug text-ink lg:text-2xl">
+                {localizedField(q, "prompt", locale)}
+              </h2>
+              <div className="mt-8 grid gap-3 sm:grid-cols-2">
+                {q.choices.map((choice) => (
+                  <label
+                    key={choice.id}
+                    className={cn(
+                      "flex cursor-pointer items-start gap-3 rounded-xl border p-4 transition-colors",
+                      answers[q.id] === choice.id
+                        ? "border-accent bg-accent-soft shadow-sm"
+                        : "border-border bg-surface hover:border-accent/40 hover:bg-surface-hover"
+                    )}
+                  >
+                    <input
+                      type="radio"
+                      name={q.id}
+                      value={choice.id}
+                      checked={answers[q.id] === choice.id}
+                      onChange={() => setAnswers((prev) => ({ ...prev, [q.id]: choice.id }))}
+                      className="mt-1 accent-accent"
+                    />
+                    <span className="text-sm leading-relaxed text-ink">
+                      {locale === "fr" ? choice.labelFr : choice.labelEn}
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="flex items-center justify-between gap-3 border-t border-border bg-surface px-5 py-4 lg:px-10">
+          <Button
+            type="button"
+            variant="secondary"
+            disabled={current === 0}
+            onClick={() => setCurrent((c) => c - 1)}
+          >
+            <MaterialIcon name="chevron_left" size={18} />
           </Button>
-        ) : (
-          <Button type="button" disabled={submitting} onClick={() => handleSubmit(false)}>
-            <MaterialIcon name="task_alt" size={18} />
-            {labels.submit}
-          </Button>
-        )}
+          {current < questions.length - 1 ? (
+            <Button type="button" onClick={() => setCurrent((c) => c + 1)}>
+              {labels.question} {current + 2}
+              <MaterialIcon name="chevron_right" size={18} />
+            </Button>
+          ) : (
+            <Button type="button" disabled={submitting} onClick={() => handleSubmit(false)}>
+              <MaterialIcon name="task_alt" size={18} />
+              {labels.submit}
+            </Button>
+          )}
+        </div>
       </div>
     </div>
   );

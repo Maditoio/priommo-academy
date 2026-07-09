@@ -1,8 +1,8 @@
 import { db } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { startExam } from "@/actions/exams";
-import { updateEnrollmentProgress } from "@/actions/enrollment";
 import { countOfficialAttempts } from "@/lib/exams";
+import { getCompletedLessonIds, getEnrollmentLessonStats } from "@/lib/lesson-progress";
 import { localizedField } from "@/lib/utils";
 import { levelName } from "@/lib/levels";
 import { generateCertificateQR } from "@/lib/qr";
@@ -60,7 +60,7 @@ export default async function EnrollmentDetailPage({
   if (!enrollment) notFound();
 
   const certification = enrollment.course.certifications[0];
-  const [certificate, user] = await Promise.all([
+  const [certificate, user, completedIds, lessonStats, attemptCounts] = await Promise.all([
     certification
       ? db.certificateIssued.findFirst({
           where: {
@@ -73,184 +73,212 @@ export default async function EnrollmentDetailPage({
       where: { id: session.user.id },
       select: { name: true, imageUrl: true },
     }),
+    getCompletedLessonIds(enrollment.id),
+    getEnrollmentLessonStats(enrollment.id, enrollment.courseId),
+    Promise.all(
+      enrollment.course.exams
+        .filter((e) => !e.isPractice)
+        .map(async (exam) => ({
+          examId: exam.id,
+          used: await countOfficialAttempts(session.user.id, exam.id),
+        }))
+    ),
   ]);
+
+  const flatLessons = enrollment.course.modules.flatMap((m) => m.lessons);
+  const firstIncomplete =
+    flatLessons.find((l) => !completedIds.has(l.id)) ?? flatLessons[0];
 
   const qrDataUrl = certificate ? await generateCertificateQR(certificate.uniqueCode) : null;
   const officialExams = enrollment.course.exams.filter((e) => !e.isPractice);
   const practiceExams = enrollment.course.exams.filter((e) => e.isPractice);
-
-  const attemptCounts = await Promise.all(
-    officialExams.map(async (exam) => ({
-      examId: exam.id,
-      used: await countOfficialAttempts(session.user.id, exam.id),
-    }))
-  );
+  const curriculumComplete = lessonStats.curriculumComplete;
 
   return (
-    <div className="py-12 lg:py-16">
-      <div className="mx-auto max-w-7xl px-6 lg:px-12">
-        <div className="mb-6">
-          <Link href="/dashboard" className="text-sm text-accent hover:underline">
-            ← {t("overview")}
+    <div className="space-y-8">
+      <div className="flex flex-wrap items-start justify-between gap-6">
+        <div className="min-w-0 space-y-3">
+          <Link href="/dashboard" className="inline-flex items-center gap-1 text-sm text-accent hover:underline">
+            <MaterialIcon name="arrow_back" size={16} />
+            {t("overview")}
           </Link>
-        </div>
-
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-2xl font-semibold text-ink">
               {localizedField(enrollment.course, "title", locale)}
             </h1>
-            <div className="mt-2">
+            <div className="mt-2 flex flex-wrap items-center gap-2">
               <StatusBadge status={enrollment.status} label={ts(enrollment.status)} />
+              <span className="text-sm text-ink-muted">
+                {lessonStats.completedLessons}/{lessonStats.totalLessons} {tc("lessons")}
+              </span>
             </div>
-          </div>
-          <div className="w-full sm:w-48">
-            <div className="mb-1 flex justify-between text-sm">
-              <span>{t("progress")}</span>
-              <span>{enrollment.progressPct}%</span>
-            </div>
-            <Progress value={enrollment.progressPct} />
           </div>
         </div>
+        <div className="w-full max-w-xs space-y-2">
+          <div className="flex justify-between text-sm">
+            <span className="text-ink-muted">{t("progress")}</span>
+            <span className="font-medium">{lessonStats.progressPct}%</span>
+          </div>
+          <Progress value={lessonStats.progressPct} />
+          {firstIncomplete && (
+            <Button asChild className="w-full">
+              <Link href={`/dashboard/enrollments/${enrollment.id}/lessons/${firstIncomplete.id}`}>
+                <MaterialIcon name="play_arrow" size={18} />
+                {curriculumComplete ? t("reviewCourse") : t("continueLearning")}
+              </Link>
+            </Button>
+          )}
+        </div>
+      </div>
 
-        <div className="mt-8 grid gap-8 lg:grid-cols-3">
-          <div className="space-y-4 lg:col-span-2">
+      <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_320px]">
+        <div className="space-y-6">
+          <section>
             <h2 className="text-lg font-semibold text-ink">{tc("curriculum")}</h2>
-            {enrollment.course.modules.map((mod) => (
-              <Card key={mod.id} className="shadow-sm">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-base">{localizedField(mod, "title", locale)}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-2">
-                    {mod.lessons.map((lesson) => (
-                      <li key={lesson.id} className="flex items-center gap-2 text-sm">
-                        <MaterialIcon name="menu_book" className="text-ink-muted" size={16} />
-                        {localizedField(lesson, "title", locale)}
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
-            ))}
+            <div className="mt-4 space-y-4">
+              {enrollment.course.modules.map((mod) => (
+                <Card key={mod.id} className="shadow-sm">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-base">{localizedField(mod, "title", locale)}</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-1">
+                    {mod.lessons.map((lesson) => {
+                      const done = completedIds.has(lesson.id);
+                      return (
+                        <Link
+                          key={lesson.id}
+                          href={`/dashboard/enrollments/${enrollment.id}/lessons/${lesson.id}`}
+                          className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-colors hover:bg-surface-hover"
+                        >
+                          <MaterialIcon
+                            name={done ? "check_circle" : "play_circle"}
+                            size={20}
+                            className={done ? "text-success" : "text-accent"}
+                          />
+                          <span className="flex-1 text-ink">{localizedField(lesson, "title", locale)}</span>
+                          {lesson.durationMin && (
+                            <span className="text-xs text-ink-muted">{lesson.durationMin} min</span>
+                          )}
+                        </Link>
+                      );
+                    })}
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </section>
 
-            {enrollment.status !== "COMPLETED" && officialExams.length > 0 && (
-              <section className="space-y-3">
-                <h3 className="flex items-center gap-2 text-base font-semibold text-ink">
+          {enrollment.status !== "COMPLETED" && officialExams.length > 0 && (
+            <section className="space-y-3">
+              <div className="flex items-center justify-between gap-4">
+                <h2 className="flex items-center gap-2 text-lg font-semibold text-ink">
                   <MaterialIcon name="school" className="text-accent" size={22} />
                   {te("officialExams")}
-                </h3>
-                {officialExams.map((exam) => {
-                  const used =
-                    attemptCounts.find((a) => a.examId === exam.id)?.used ?? 0;
-                  const remaining = Math.max(0, exam.maxAttempts - used);
-                  const canStart = remaining > 0 && exam._count.questions > 0;
+                </h2>
+              </div>
+              {!curriculumComplete && (
+                <Card className="border-warning/30 bg-warning/5 shadow-sm">
+                  <CardContent className="flex items-start gap-3 pt-5 text-sm text-ink-muted">
+                    <MaterialIcon name="info" className="mt-0.5 shrink-0 text-warning" size={20} />
+                    {t("completeCurriculumFirst")}
+                  </CardContent>
+                </Card>
+              )}
+              {officialExams.map((exam) => {
+                const used = attemptCounts.find((a) => a.examId === exam.id)?.used ?? 0;
+                const remaining = Math.max(0, exam.maxAttempts - used);
+                const canStart = remaining > 0 && exam._count.questions > 0 && curriculumComplete;
 
-                  return (
-                    <Card key={exam.id} className="shadow-sm">
-                      <CardContent className="pt-6">
-                        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                          <div>
-                            <p className="font-medium text-ink">
-                              {localizedField(exam, "title", locale)}
-                            </p>
-                            <p className="mt-1 text-sm text-ink-muted">
-                              {te("passingScore")}: {exam.passingScore}% · {te("duration")}:{" "}
-                              {exam.durationMin} min
-                            </p>
-                            <p className="text-sm text-ink-muted">
-                              {te("attemptsRemaining")}: {remaining}/{exam.maxAttempts}
-                            </p>
-                          </div>
-                          {canStart ? (
-                            <form action={startExam.bind(null, exam.id, "OFFICIAL", locale, enrollment.id)}>
-                              <Button type="submit">
-                                <MaterialIcon name="play_arrow" size={18} />
-                                {t("takeExam")}
-                              </Button>
-                            </form>
-                          ) : (
-                            <p className="text-sm text-ink-muted">{te("noAttemptsLeft")}</p>
-                          )}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  );
-                })}
-              </section>
-            )}
-
-            {practiceExams.length > 0 && (
-              <section className="space-y-3">
-                <h3 className="flex items-center gap-2 text-base font-semibold text-ink">
-                  <MaterialIcon name="fitness_center" className="text-accent" size={22} />
-                  {te("practiceExams")}
-                </h3>
-                {practiceExams.map((exam) => (
-                  <Card key={exam.id} className="border-dashed shadow-sm">
-                    <CardContent className="pt-6">
-                      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                        <div>
-                          <p className="font-medium text-ink">
-                            {localizedField(exam, "title", locale)}
-                          </p>
-                          <p className="mt-1 text-sm text-ink-muted">{te("practiceDescription")}</p>
-                        </div>
-                        {exam._count.questions >= 10 ? (
-                          <form
-                            action={startExam.bind(null, exam.id, "PRACTICE", locale, enrollment.id)}
-                          >
-                            <Button type="submit" variant="secondary">
-                              <MaterialIcon name="quiz" size={18} />
-                              {te("startPractice")}
-                            </Button>
-                          </form>
-                        ) : (
-                          <p className="text-sm text-ink-muted">{te("notEnoughQuestions")}</p>
-                        )}
+                return (
+                  <Card key={exam.id} className="shadow-sm">
+                    <CardContent className="flex flex-col gap-4 pt-6 sm:flex-row sm:items-center sm:justify-between">
+                      <div>
+                        <p className="font-medium text-ink">{localizedField(exam, "title", locale)}</p>
+                        <p className="mt-1 text-sm text-ink-muted">
+                          {te("passingScore")}: {exam.passingScore}% · {te("duration")}: {exam.durationMin} min
+                        </p>
+                        <p className="text-sm text-ink-muted">
+                          {te("attemptsRemaining")}: {remaining}/{exam.maxAttempts}
+                        </p>
                       </div>
+                      {canStart ? (
+                        <form action={startExam.bind(null, exam.id, "OFFICIAL", locale, enrollment.id)}>
+                          <Button type="submit">
+                            <MaterialIcon name="play_arrow" size={18} />
+                            {t("takeExam")}
+                          </Button>
+                        </form>
+                      ) : (
+                        <p className="text-sm text-ink-muted">
+                          {!curriculumComplete
+                            ? t("completeCurriculumFirst")
+                            : te("noAttemptsLeft")}
+                        </p>
+                      )}
                     </CardContent>
                   </Card>
-                ))}
-              </section>
-            )}
-          </div>
+                );
+              })}
+            </section>
+          )}
 
-          <div className="space-y-4">
-            {certificate && qrDataUrl && certification && (
-              <CertificateDisplay
-                uniqueCode={certificate.uniqueCode}
-                status={certificate.status}
-                level={levelName(certification.level, locale)}
-                title={localizedField(certification, "title", locale)}
-                holderName={user.name}
-                holderImageUrl={user.imageUrl}
-                issuedAt={certificate.issuedAt.toISOString()}
-                expiresAt={certificate.expiresAt?.toISOString() ?? null}
-                qrDataUrl={qrDataUrl}
-                locale={locale}
-                statusLabel={ts(certificate.status)}
-                compact
-                labels={{
-                  holder: tv("holder"),
-                  issuedAt: tv("issuedAt"),
-                  expiresAt: tv("expiresAt"),
-                  verify: t("viewCertificate"),
-                  copyLink: tv("copyLink"),
-                  copied: tv("copied"),
-                }}
-              />
-            )}
-
-            <form
-              action={updateEnrollmentProgress.bind(null, enrollment.id, enrollment.progressPct + 25, locale)}
-            >
-              <Button type="submit" variant="secondary" className="w-full">
-                +25% {t("progress")}
-              </Button>
-            </form>
-          </div>
+          {practiceExams.length > 0 && (
+            <section className="space-y-3">
+              <h2 className="flex items-center gap-2 text-lg font-semibold text-ink">
+                <MaterialIcon name="fitness_center" className="text-accent" size={22} />
+                {te("practiceExams")}
+              </h2>
+              {practiceExams.map((exam) => (
+                <Card key={exam.id} className="border-dashed shadow-sm">
+                  <CardContent className="flex flex-col gap-4 pt-6 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <p className="font-medium text-ink">{localizedField(exam, "title", locale)}</p>
+                      <p className="mt-1 text-sm text-ink-muted">{te("practiceDescription")}</p>
+                    </div>
+                    {exam._count.questions >= 10 ? (
+                      <form action={startExam.bind(null, exam.id, "PRACTICE", locale, enrollment.id)}>
+                        <Button type="submit" variant="secondary">
+                          <MaterialIcon name="quiz" size={18} />
+                          {te("startPractice")}
+                        </Button>
+                      </form>
+                    ) : (
+                      <p className="text-sm text-ink-muted">{te("notEnoughQuestions")}</p>
+                    )}
+                  </CardContent>
+                </Card>
+              ))}
+            </section>
+          )}
         </div>
+
+        <aside className="space-y-4 xl:sticky xl:top-8 xl:self-start">
+          {certificate && qrDataUrl && certification && (
+            <CertificateDisplay
+              uniqueCode={certificate.uniqueCode}
+              status={certificate.status}
+              level={levelName(certification.level, locale)}
+              title={localizedField(certification, "title", locale)}
+              holderName={user.name}
+              holderImageUrl={user.imageUrl}
+              issuedAt={certificate.issuedAt.toISOString()}
+              expiresAt={certificate.expiresAt?.toISOString() ?? null}
+              qrDataUrl={qrDataUrl}
+              locale={locale}
+              statusLabel={ts(certificate.status)}
+              compact
+              verifyHref={`/dashboard/verify/${certificate.uniqueCode}`}
+              labels={{
+                holder: tv("holder"),
+                issuedAt: tv("issuedAt"),
+                expiresAt: tv("expiresAt"),
+                verify: t("viewCertificate"),
+                copyLink: tv("copyLink"),
+                copied: tv("copied"),
+              }}
+            />
+          )}
+        </aside>
       </div>
     </div>
   );

@@ -90,7 +90,7 @@ export async function CourseDetailView({ locale, slug, variant = "public" }: Cou
 
             <Separator className="my-8" />
 
-            <h2 className="text-xl font-semibold text-ink">{t("curriculum")}</h2>
+            <h2 id="curriculum" className="text-xl font-semibold text-ink">{t("curriculum")}</h2>
             <div className="mt-4 space-y-4">
               {course.modules.map((mod) => (
                 <Card key={mod.id}>
@@ -140,24 +140,36 @@ export async function CourseDetailView({ locale, slug, variant = "public" }: Cou
                 {session?.user ? (
                   enrollmentId ? (
                     <Button asChild className="mt-6 w-full" size="lg">
-                      <Link href={`/dashboard/enrollments/${enrollmentId}`}>{td("takeExam")}</Link>
+                      <Link href={`/dashboard/enrollments/${enrollmentId}`}>
+                        {td("continueLearning")}
+                      </Link>
                     </Button>
                   ) : (
-                    <form
-                      action={async () => {
-                        "use server";
-                        await enrollInCourse(course.id, locale);
-                      }}
-                    >
-                      <Button type="submit" className="mt-6 w-full" size="lg">
-                        {t("enroll")}
+                    <div className="mt-6 space-y-2">
+                      <Button asChild className="w-full" size="lg" variant="secondary">
+                        <Link href="#curriculum">{t("viewCourse")}</Link>
                       </Button>
-                    </form>
+                      <form
+                        action={async () => {
+                          "use server";
+                          await enrollInCourse(course.id, locale);
+                        }}
+                      >
+                        <Button type="submit" className="w-full" size="lg">
+                          {t("enroll")}
+                        </Button>
+                      </form>
+                    </div>
                   )
                 ) : (
-                  <Button className="mt-6 w-full" size="lg" asChild>
-                    <Link href="/login">{t("enroll")}</Link>
-                  </Button>
+                  <div className="mt-6 space-y-2">
+                    <Button className="w-full" size="lg" variant="secondary" disabled>
+                      {t("viewCourse")}
+                    </Button>
+                    <Button className="w-full" size="lg" asChild>
+                      <Link href="/login">{t("enroll")}</Link>
+                    </Button>
+                  </div>
                 )}
               </CardContent>
             </Card>

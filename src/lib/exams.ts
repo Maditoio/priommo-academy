@@ -104,6 +104,18 @@ export async function startExamAttempt(params: {
     if (used >= exam.maxAttempts) {
       throw new Error("No attempts remaining");
     }
+
+    const totalLessons = await db.lesson.count({
+      where: { module: { courseId: exam.courseId } },
+    });
+    if (totalLessons > 0) {
+      const completedLessons = await db.lessonCompletion.count({
+        where: { enrollmentId: enrollment.id },
+      });
+      if (completedLessons < totalLessons) {
+        throw new Error("Curriculum incomplete");
+      }
+    }
   }
 
   const pool = exam.questions.filter((q) => q.choices.some((c) => c.isCorrect));

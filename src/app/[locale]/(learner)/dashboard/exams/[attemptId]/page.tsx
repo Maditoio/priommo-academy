@@ -44,19 +44,17 @@ export default async function ExamAttemptPage({
     .sort((a, b) => a.order - b.order);
 
   return (
-    <div className="px-6 py-12">
-      <ExamTaker
-        attemptId={attempt.id}
-        locale={locale}
-        endsAt={attempt.endsAt.toISOString()}
-        questions={questions}
-        labels={{
-          submit: t("submit"),
-          timeRemaining: t("timeRemaining"),
-          question: t("question"),
-          of: t("of"),
-        }}
-      />
-    </div>
+    <ExamTaker
+      attemptId={attempt.id}
+      locale={locale}
+      endsAt={attempt.endsAt.toISOString()}
+      questions={questions}
+      labels={{
+        submit: t("submit"),
+        timeRemaining: t("timeRemaining"),
+        question: t("question"),
+        of: t("of"),
+      }}
+    />
   );
 }

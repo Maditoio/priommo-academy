@@ -79,9 +79,12 @@ export default async function HomePage({
                   key={course.id}
                   course={course}
                   locale={locale}
+                  viewLabel={tc("viewCourse")}
                   enrollLabel={tc("enroll")}
+                  continueLabel={tc("enroll")}
                   levelLabel={tc("level")}
                   freeLabel={tcommon("free")}
+                  courseBasePath="/courses"
                 />
               ))}
             </div>

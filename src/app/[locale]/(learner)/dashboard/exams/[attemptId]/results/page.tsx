@@ -43,39 +43,35 @@ export default async function ExamResultsPage({
   });
 
   return (
-    <div className="px-6 py-12">
-      <div className="mx-auto max-w-lg">
-        <div className="text-center">
-          <div
-            className={`mx-auto flex h-16 w-16 items-center justify-center rounded-full ${
-              attempt.passed ? "bg-success/10" : "bg-danger/10"
-            }`}
-          >
-            <MaterialIcon
-              name={attempt.passed ? "emoji_events" : "cancel"}
-              className={attempt.passed ? "text-success" : "text-danger"}
-              size={32}
-            />
-          </div>
-          <h1 className="mt-4 text-2xl font-semibold text-ink">
-            {attempt.passed ? t("passed") : t("failed")}
-          </h1>
-          <p className="mt-2 text-ink-muted">
-            {localizedField(attempt.exam, "title", locale)} — {attempt.score}%
-          </p>
-          {isPractice && (
-            <p className="mt-1 text-sm text-ink-muted">{t("practiceNote")}</p>
-          )}
-          {attempt.timedOut && (
-            <p className="mt-2 text-sm text-warning">{t("timedOut")}</p>
-          )}
+    <div className="mx-auto max-w-3xl space-y-8 py-8">
+      <div className="text-center">
+        <div
+          className={`mx-auto flex h-16 w-16 items-center justify-center rounded-2xl ${
+            attempt.passed ? "bg-success/10" : "bg-danger/10"
+          }`}
+        >
+          <MaterialIcon
+            name={attempt.passed ? "emoji_events" : "cancel"}
+            className={attempt.passed ? "text-success" : "text-danger"}
+            size={32}
+          />
         </div>
+        <h1 className="mt-4 text-2xl font-semibold text-ink">
+          {attempt.passed ? t("passed") : t("failed")}
+        </h1>
+        <p className="mt-2 text-ink-muted">
+          {localizedField(attempt.exam, "title", locale)} — {attempt.score}%
+        </p>
+        {isPractice && <p className="mt-1 text-sm text-ink-muted">{t("practiceNote")}</p>}
+        {attempt.timedOut && <p className="mt-2 text-sm text-warning">{t("timedOut")}</p>}
+      </div>
 
-        <div className="mt-8 space-y-3">
-          <h2 className="flex items-center gap-2 text-sm font-semibold text-ink">
-            <MaterialIcon name="category" size={18} className="text-accent" />
-            {t("categoryBreakdown")}
-          </h2>
+      <div className="space-y-3">
+        <h2 className="flex items-center gap-2 text-sm font-semibold text-ink">
+          <MaterialIcon name="category" size={18} className="text-accent" />
+          {t("categoryBreakdown")}
+        </h2>
+        <div className="grid gap-3 sm:grid-cols-2">
           {categoryScores.map((cat) => (
             <div
               key={cat.categoryId}
@@ -94,25 +90,25 @@ export default async function ExamResultsPage({
             </div>
           ))}
         </div>
+      </div>
 
-        <div className="mt-8 flex flex-col gap-2">
-          {enrollment && (
-            <Button asChild variant="secondary">
-              <Link href={`/dashboard/enrollments/${enrollment.id}`}>
-                <MaterialIcon name="arrow_back" size={18} />
-                {t("backToCourse")}
-              </Link>
-            </Button>
-          )}
-          {!isPractice && !attempt.passed && enrollment && (
-            <Button asChild>
-              <Link href={`/dashboard/enrollments/${enrollment.id}`}>
-                <MaterialIcon name="replay" size={18} />
-                {t("retry")}
-              </Link>
-            </Button>
-          )}
-        </div>
+      <div className="flex flex-col gap-2 sm:flex-row">
+        {enrollment && (
+          <Button asChild variant="secondary" className="flex-1">
+            <Link href={`/dashboard/enrollments/${enrollment.id}`}>
+              <MaterialIcon name="arrow_back" size={18} />
+              {t("backToCourse")}
+            </Link>
+          </Button>
+        )}
+        {!isPractice && !attempt.passed && enrollment && (
+          <Button asChild className="flex-1">
+            <Link href={`/dashboard/enrollments/${enrollment.id}`}>
+              <MaterialIcon name="replay" size={18} />
+              {t("retry")}
+            </Link>
+          </Button>
+        )}
       </div>
     </div>
   );

@@ -22,7 +22,11 @@ export default async function LearnerLayout({
 
   const labels = {
     appName: tc("appName"),
+    workspace: td("workspace"),
     learner: td("learnerSpace"),
+    learning: td("navLearning"),
+    account: td("navAccount"),
+    adminSection: td("navAdmin"),
     overview: td("overview"),
     certificates: td("myCertificates"),
     profile: t("profile"),

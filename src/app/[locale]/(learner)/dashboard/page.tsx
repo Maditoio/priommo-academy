@@ -69,7 +69,7 @@ export default async function DashboardPage({
                     {format(enrollment.enrolledAt, "PP", { locale: dateLocale })}
                   </p>
                   <Button asChild size="sm" className="w-full">
-                    <Link href={`/dashboard/enrollments/${enrollment.id}`}>{t("takeExam")}</Link>
+                    <Link href={`/dashboard/enrollments/${enrollment.id}`}>{t("continueLearning")}</Link>
                   </Button>
                 </CardContent>
               </Card>

@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { auth } from "@/lib/auth";
 import { CourseCard } from "@/components/public/course-card";
 import { CourseFilters } from "@/components/public/course-filters";
 import { Pagination } from "@/components/admin/pagination";
@@ -22,7 +23,10 @@ async function CourseList({
 }) {
   const t = await getTranslations("courses");
   const tcommon = await getTranslations("common");
+  const td = await getTranslations("dashboard");
   const ta = await getTranslations("admin");
+
+  const session = await auth();
 
   const levelRecord =
     levelSlug && levelSlug !== "all"
@@ -53,6 +57,17 @@ async function CourseList({
     db.course.count({ where }),
   ]);
 
+  const enrollmentMap = session?.user
+    ? Object.fromEntries(
+        (
+          await db.enrollment.findMany({
+            where: { userId: session.user.id, courseId: { in: courses.map((c) => c.id) } },
+            select: { id: true, courseId: true },
+          })
+        ).map((e) => [e.courseId, e.id])
+      )
+    : {};
+
   return (
     <>
       {courses.length > 0 ? (
@@ -62,10 +77,13 @@ async function CourseList({
               key={course.id}
               course={course}
               locale={locale}
+              viewLabel={t("viewCourse")}
               enrollLabel={t("enroll")}
+              continueLabel={td("continueLearning")}
               levelLabel={t("level")}
               freeLabel={tcommon("free")}
               courseBasePath={courseBasePath}
+              enrollmentId={enrollmentMap[course.id] ?? null}
             />
           ))}
         </div>
