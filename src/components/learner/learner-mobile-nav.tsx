@@ -14,7 +14,7 @@ export function LearnerMobileNav({ labels }: { labels: Record<string, string> })
   const pathname = usePathname();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 flex border-t border-border bg-surface lg:hidden">
+    <nav className="fixed bottom-0 left-0 right-0 z-40 flex border-t border-border bg-surface sm:hidden">
       {items.map((item) => {
         const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
         return (

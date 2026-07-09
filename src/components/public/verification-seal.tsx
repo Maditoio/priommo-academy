@@ -11,15 +11,48 @@ interface VerificationSealProps {
 }
 
 const sizeMap = {
-  sm: { outer: "h-16 w-16", inner: "h-[3.25rem] w-[3.25rem]", text: "text-[0.5rem]", level: "text-[0.55rem]" },
-  md: { outer: "h-28 w-28", inner: "h-[6.25rem] w-[6.25rem]", text: "text-[0.65rem]", level: "text-xs" },
-  lg: { outer: "h-40 w-40", inner: "h-[9rem] w-[9rem]", text: "text-xs", level: "text-sm" },
+  sm: {
+    wrap: "w-[4.5rem]",
+    badge: "h-[3.75rem]",
+    monogram: "text-xs",
+    level: "text-[0.5rem]",
+    code: "text-[0.5rem]",
+    ribbon: "h-2.5",
+  },
+  md: {
+    wrap: "w-[7.5rem]",
+    badge: "h-[6.25rem]",
+    monogram: "text-lg",
+    level: "text-[0.6rem]",
+    code: "text-[0.65rem]",
+    ribbon: "h-3.5",
+  },
+  lg: {
+    wrap: "w-[10.5rem]",
+    badge: "h-[8.75rem]",
+    monogram: "text-2xl",
+    level: "text-xs",
+    code: "text-xs",
+    ribbon: "h-4",
+  },
 };
 
-const ringClass: Record<SealStatus, string> = {
-  valid: "accent-gradient",
-  expired: "bg-ink-muted/30",
-  revoked: "bg-danger/80",
+const statusStyles: Record<SealStatus, { frame: string; ribbon: string; text: string }> = {
+  valid: {
+    frame: "accent-gradient shadow-md",
+    ribbon: "bg-accent/90",
+    text: "text-accent",
+  },
+  expired: {
+    frame: "bg-ink-muted/25 shadow-sm",
+    ribbon: "bg-ink-muted/50",
+    text: "text-ink-muted",
+  },
+  revoked: {
+    frame: "bg-danger/80 shadow-sm",
+    ribbon: "bg-danger",
+    text: "text-danger",
+  },
 };
 
 export function VerificationSeal({
@@ -30,33 +63,46 @@ export function VerificationSeal({
   className,
 }: VerificationSealProps) {
   const s = sizeMap[size];
+  const palette = statusStyles[status];
 
   return (
-    <div className={cn("flex flex-col items-center gap-2", className)}>
-      <div
-        className={cn(
-          "relative flex items-center justify-center rounded-full p-[3px]",
-          s.outer,
-          ringClass[status]
-        )}
-      >
+    <div className={cn("flex flex-col items-center gap-2", s.wrap, className)}>
+      <div className="relative w-full">
+        <div
+          className={cn("absolute inset-x-3 top-0 rounded-t-sm", s.ribbon, palette.ribbon)}
+          aria-hidden
+        />
         <div
           className={cn(
-            "flex flex-col items-center justify-center rounded-full bg-surface text-center shadow-sm",
-            s.inner
+            "relative mx-auto mt-1 flex w-[88%] flex-col items-center justify-center rounded-lg p-[3px]",
+            s.badge,
+            palette.frame
           )}
         >
-          <span className="text-sm font-semibold text-accent" aria-hidden>
-            PA
-          </span>
-          {level && (
-            <span className={cn("mt-0.5 font-medium uppercase tracking-wide text-ink-muted", s.level)}>
-              {level}
+          <div
+            className="flex h-full w-full flex-col items-center justify-center rounded-[0.4rem] bg-surface text-center shadow-inner"
+            style={{
+              clipPath:
+                "polygon(0 0, 100% 0, 100% 72%, 50% 100%, 0 72%)",
+            }}
+          >
+            <span className={cn("font-bold leading-none", palette.text, s.monogram)} aria-hidden>
+              PA
             </span>
-          )}
+            {level && (
+              <span
+                className={cn(
+                  "mt-1 max-w-[90%] truncate font-semibold uppercase tracking-wider text-ink-muted",
+                  s.level
+                )}
+              >
+                {level}
+              </span>
+            )}
+          </div>
         </div>
       </div>
-      <p className={cn("font-mono-code font-medium uppercase text-ink-muted", s.text)}>
+      <p className={cn("w-full truncate text-center font-mono-code font-medium uppercase text-ink-muted", s.code)}>
         {code.toUpperCase()}
       </p>
     </div>
