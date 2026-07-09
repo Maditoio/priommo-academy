@@ -2,7 +2,7 @@
 
 import { useState, Suspense } from "react";
 import { signIn } from "next-auth/react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
 import { Button } from "@/components/ui/button";
@@ -12,7 +12,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 
 function LoginForm() {
   const t = useTranslations("auth");
-  const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") ?? "/fr/dashboard";
   const [error, setError] = useState("");
@@ -27,16 +26,20 @@ function LoginForm() {
     const result = await signIn("credentials", {
       email: formData.get("email"),
       password: formData.get("password"),
+      callbackUrl,
       redirect: false,
     });
 
     setLoading(false);
+
     if (result?.error) {
       setError(t("invalidCredentials"));
       return;
     }
-    router.push(callbackUrl);
-    router.refresh();
+
+    if (result?.ok) {
+      window.location.href = callbackUrl;
+    }
   }
 
   return (

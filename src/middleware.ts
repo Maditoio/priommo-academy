@@ -12,6 +12,13 @@ const orgPaths = ["/org"];
 
 type TokenRole = "LEARNER" | "ADMIN" | "ORG_ADMIN";
 
+function isSecureRequest(request: NextRequest) {
+  return (
+    request.nextUrl.protocol === "https:" ||
+    request.headers.get("x-forwarded-proto") === "https"
+  );
+}
+
 export default async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const locale = routing.locales.find((l) => pathname.startsWith(`/${l}/`)) ?? "fr";
@@ -22,9 +29,11 @@ export default async function middleware(request: NextRequest) {
   const isOrgRoute = orgPaths.some((p) => pathWithoutLocale.startsWith(p));
 
   if (isAdminRoute || isLearnerRoute || isOrgRoute) {
+    const secure = isSecureRequest(request);
     const token = await getToken({
       req: request,
       secret: process.env.AUTH_SECRET,
+      secureCookie: secure,
     });
 
     if (!token) {
