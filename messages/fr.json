@@ -176,7 +176,18 @@
     "startPractice": "Commencer l'entraînement",
     "attemptsRemaining": "Tentatives restantes",
     "noAttemptsLeft": "Plus de tentatives disponibles",
-    "notEnoughQuestions": "Au moins 10 questions requises"
+    "notEnoughQuestions": "Au moins 10 questions requises",
+    "previewCourse": "Aperçu du cours",
+    "tabCurriculum": "Programme",
+    "nameFr": "Nom (FR)",
+    "nameEn": "Nom (EN)",
+    "noModules": "Aucun module. Ajoutez le premier ci-dessous.",
+    "noCategories": "Aucune catégorie de connaissances.",
+    "moduleOrder": "Ordre",
+    "lessonOrder": "Ordre de la leçon",
+    "categoriesSubtitle": "Définissez les domaines de connaissances pour les questions et les seuils de réussite par catégorie.",
+    "curriculumSubtitle": "Organisez le contenu en modules et leçons.",
+    "examsSubtitle": "Configurez les examens officiels et d'entraînement, puis la banque de questions."
   },
   "admin": {
     "title": "Administration",

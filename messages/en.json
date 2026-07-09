@@ -176,7 +176,18 @@
     "startPractice": "Start practice",
     "attemptsRemaining": "Attempts remaining",
     "noAttemptsLeft": "No attempts remaining",
-    "notEnoughQuestions": "Need at least 10 questions in bank"
+    "notEnoughQuestions": "Need at least 10 questions in bank",
+    "previewCourse": "Preview course",
+    "tabCurriculum": "Curriculum",
+    "nameFr": "Name (FR)",
+    "nameEn": "Name (EN)",
+    "noModules": "No modules yet. Add your first module below.",
+    "noCategories": "No knowledge categories yet.",
+    "moduleOrder": "Order",
+    "lessonOrder": "Lesson order",
+    "categoriesSubtitle": "Define knowledge areas used to tag exam questions and set per-category pass thresholds.",
+    "curriculumSubtitle": "Organize course content into modules and lessons.",
+    "examsSubtitle": "Configure official and practice exams, then build the question bank."
   },
   "admin": {
     "title": "Administration",
