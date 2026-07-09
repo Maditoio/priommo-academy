@@ -26,7 +26,7 @@ export default async function LearnerLayout({
     overview: td("overview"),
     certificates: td("myCertificates"),
     profile: t("profile"),
-    browseCourses: t("courses"),
+    browseCourses: td("browseCourses"),
     verify: t("verify"),
     admin: t("admin"),
     logout: t("logout"),

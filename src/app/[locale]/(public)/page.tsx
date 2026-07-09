@@ -1,9 +1,11 @@
 import { Link } from "@/i18n/routing";
+import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { CourseCard } from "@/components/public/course-card";
 import { Button } from "@/components/ui/button";
 import { MaterialIcon } from "@/components/ui/material-icon";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { redirect } from "next/navigation";
 
 export default async function HomePage({
   params,
@@ -12,6 +14,11 @@ export default async function HomePage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
+
+  const session = await auth();
+  if (session?.user) {
+    redirect(`/${locale}/dashboard`);
+  }
 
   const t = await getTranslations("home");
   const tc = await getTranslations("courses");

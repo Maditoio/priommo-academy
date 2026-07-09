@@ -24,9 +24,16 @@ interface CourseCardProps {
   enrollLabel: string;
   levelLabel: string;
   freeLabel: string;
+  courseBasePath?: string;
 }
 
-export function CourseCard({ course, locale, enrollLabel, freeLabel }: CourseCardProps) {
+export function CourseCard({
+  course,
+  locale,
+  enrollLabel,
+  freeLabel,
+  courseBasePath = "/courses",
+}: CourseCardProps) {
   const title = localizedField(course, "title", locale);
   const description = localizedField(course, "description", locale);
   const price = parseFloat(course.price.toString());
@@ -57,7 +64,7 @@ export function CourseCard({ course, locale, enrollLabel, freeLabel }: CourseCar
           {isFree ? freeLabel : formatPrice(price, course.currency, locale)}
         </span>
         <Button asChild size="sm" variant="secondary">
-          <Link href={`/courses/${course.slug}`}>{enrollLabel}</Link>
+          <Link href={`${courseBasePath}/${course.slug}`}>{enrollLabel}</Link>
         </Button>
       </CardFooter>
     </Card>

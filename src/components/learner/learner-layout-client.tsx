@@ -30,7 +30,7 @@ function SidebarPanel({
   return (
     <>
       <div className="flex h-16 items-center gap-2.5 border-b border-border px-5">
-        <Link href="/" className="flex items-center gap-2.5" onClick={onNavigate}>
+        <Link href="/dashboard" className="flex items-center gap-2.5" onClick={onNavigate}>
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent-soft">
             <MaterialIcon name="workspace_premium" className="text-accent" size={18} />
           </div>

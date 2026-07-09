@@ -7,11 +7,16 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { MaterialIcon } from "@/components/ui/material-icon";
+import { cn } from "@/lib/utils";
 
 export function VerifySearchForm({
   labels,
+  verifyBasePath = "/verify",
+  compact = false,
 }: {
   labels: { title: string; subtitle: string; placeholder: string; submit: string };
+  verifyBasePath?: string;
+  compact?: boolean;
 }) {
   const [code, setCode] = useState("");
   const router = useRouter();
@@ -20,7 +25,31 @@ export function VerifySearchForm({
     e.preventDefault();
     const trimmed = code.trim();
     if (!trimmed) return;
-    router.push(`/verify/${trimmed}`);
+    router.push(`${verifyBasePath}/${trimmed}`);
+  }
+
+  const form = (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="space-y-2">
+        {!compact && <Label htmlFor="code">{labels.placeholder}</Label>}
+        <Input
+          id="code"
+          value={code}
+          onChange={(e) => setCode(e.target.value)}
+          placeholder="ABC123XYZ"
+          className="font-mono-code"
+          required
+        />
+      </div>
+      <Button type="submit" className={compact ? "w-full sm:w-auto" : "w-full"}>
+        <MaterialIcon name="verified" size={18} />
+        {labels.submit}
+      </Button>
+    </form>
+  );
+
+  if (compact) {
+    return <Card className="p-6 shadow-sm">{form}</Card>;
   }
 
   return (
@@ -33,23 +62,7 @@ export function VerifySearchForm({
           <h1 className="mt-6 text-[1.875rem] font-semibold text-ink">{labels.title}</h1>
           <p className="mt-2 text-sm text-ink-muted">{labels.subtitle}</p>
         </div>
-        <form onSubmit={handleSubmit} className="mt-8 space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="code">{labels.placeholder}</Label>
-            <Input
-              id="code"
-              value={code}
-              onChange={(e) => setCode(e.target.value)}
-              placeholder="ABC123XYZ"
-              className="font-mono-code"
-              required
-            />
-          </div>
-          <Button type="submit" className="w-full">
-            <MaterialIcon name="verified" size={18} />
-            {labels.submit}
-          </Button>
-        </form>
+        <div className={cn("mt-8")}>{form}</div>
       </Card>
     </div>
   );

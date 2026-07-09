@@ -81,7 +81,7 @@ export default async function DashboardPage({
               <MaterialIcon name="menu_book" className="text-ink-muted/40" size={40} />
               <p className="mt-3 text-ink-muted">{t("noEnrollments")}</p>
               <Button asChild className="mt-4" variant="secondary">
-                <Link href="/courses">{t("browseCourses")}</Link>
+                <Link href="/dashboard/courses">{t("browseCourses")}</Link>
               </Button>
             </CardContent>
           </Card>
@@ -113,7 +113,7 @@ export default async function DashboardPage({
                   </p>
                   <StatusBadge status={cert.status} label={ts(cert.status)} className="mt-2" />
                   <Button asChild size="sm" variant="secondary" className="mt-4 w-full">
-                    <Link href={`/verify/${cert.uniqueCode}`}>{t("viewCertificate")}</Link>
+                    <Link href={`/dashboard/verify/${cert.uniqueCode}`}>{t("viewCertificate")}</Link>
                   </Button>
                 </CardContent>
               </Card>

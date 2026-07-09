@@ -63,6 +63,7 @@ export default async function CertificatesPage({
                 locale={locale}
                 statusLabel={ts(effectiveStatus)}
                 compact
+                verifyHref={`/dashboard/verify/${cert.uniqueCode}`}
                 labels={{
                   holder: tv("holder"),
                   issuedAt: tv("issuedAt"),

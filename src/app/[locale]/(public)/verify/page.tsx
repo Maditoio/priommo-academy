@@ -1,5 +1,7 @@
+import { auth } from "@/lib/auth";
 import { VerifySearchForm } from "@/components/public/verify-search-form";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { redirect } from "next/navigation";
 
 export default async function VerifySearchPage({
   params,
@@ -8,6 +10,11 @@ export default async function VerifySearchPage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
+
+  const session = await auth();
+  if (session?.user) {
+    redirect(`/${locale}/dashboard/verify`);
+  }
 
   const t = await getTranslations("verify");
 

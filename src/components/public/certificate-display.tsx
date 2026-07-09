@@ -33,6 +33,7 @@ interface CertificateDisplayProps {
     copied?: string;
   };
   compact?: boolean;
+  verifyHref?: string;
 }
 
 export function CertificateDisplay({
@@ -49,6 +50,7 @@ export function CertificateDisplay({
   statusLabel,
   labels,
   compact = false,
+  verifyHref,
 }: CertificateDisplayProps) {
   const dateLocale = locale === "fr" ? fr : enUS;
   const issued = new Date(issuedAt);
@@ -114,7 +116,7 @@ export function CertificateDisplay({
 
       <div className="mt-6 flex flex-col gap-2 sm:flex-row">
         <Button asChild variant="default" className="flex-1">
-          <Link href={`/verify/${uniqueCode}`}>
+          <Link href={verifyHref ?? `/verify/${uniqueCode}`}>
             <MaterialIcon name="open_in_new" size={18} />
             {labels.verify}
           </Link>

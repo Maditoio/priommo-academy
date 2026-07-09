@@ -6,10 +6,10 @@ import { MaterialIcon } from "@/components/ui/material-icon";
 
 const navItems = [
   { href: "/dashboard", labelKey: "overview", icon: "dashboard", exact: true },
+  { href: "/dashboard/courses", labelKey: "browseCourses", icon: "menu_book" },
   { href: "/dashboard/certificates", labelKey: "certificates", icon: "workspace_premium" },
   { href: "/profile", labelKey: "profile", icon: "manage_accounts" },
-  { href: "/courses", labelKey: "browseCourses", icon: "menu_book" },
-  { href: "/verify", labelKey: "verify", icon: "verified" },
+  { href: "/dashboard/verify", labelKey: "verify", icon: "verified" },
 ];
 
 export function LearnerSidebarNav({
