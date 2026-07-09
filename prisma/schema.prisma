@@ -140,17 +140,19 @@ model ExamAttempt {
 }
 
 model Certification {
-  id            String              @id @default(cuid())
-  slug          String              @unique
-  titleFr       String
-  titleEn       String
-  descriptionFr String
-  descriptionEn String
-  level         String
-  courseId      String?
-  course        Course?             @relation(fields: [courseId], references: [id])
-  issued        CertificateIssued[]
-  createdAt     DateTime            @default(now())
+  id              String              @id @default(cuid())
+  slug            String              @unique
+  titleFr         String
+  titleEn         String
+  descriptionFr   String
+  descriptionEn   String
+  level           String
+  rank            Int                 @default(0)
+  validityMonths  Int                 @default(24)
+  courseId        String?
+  course          Course?             @relation(fields: [courseId], references: [id])
+  issued          CertificateIssued[]
+  createdAt       DateTime            @default(now())
 }
 
 model CertificateIssued {

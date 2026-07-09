@@ -17,9 +17,9 @@ const sizeMap = {
 };
 
 const ringClass: Record<SealStatus, string> = {
-  valid: "seal-ring-valid",
-  expired: "seal-ring-expired",
-  revoked: "seal-ring-revoked",
+  valid: "accent-gradient",
+  expired: "bg-ink-muted/30",
+  revoked: "bg-danger/80",
 };
 
 export function VerificationSeal({
@@ -30,10 +30,9 @@ export function VerificationSeal({
   className,
 }: VerificationSealProps) {
   const s = sizeMap[size];
-  const displayCode = code.toUpperCase();
 
   return (
-    <div className={cn("flex flex-col items-center gap-3", className)}>
+    <div className={cn("flex flex-col items-center gap-2", className)}>
       <div
         className={cn(
           "relative flex items-center justify-center rounded-full p-[3px]",
@@ -43,11 +42,11 @@ export function VerificationSeal({
       >
         <div
           className={cn(
-            "flex flex-col items-center justify-center rounded-full bg-paper text-center",
+            "flex flex-col items-center justify-center rounded-full bg-surface text-center shadow-sm",
             s.inner
           )}
         >
-          <span className="font-display font-semibold text-navy" aria-hidden>
+          <span className="text-sm font-semibold text-accent" aria-hidden>
             PA
           </span>
           {level && (
@@ -57,15 +56,14 @@ export function VerificationSeal({
           )}
         </div>
       </div>
-      <p className={cn("font-mono-code font-medium uppercase text-ink", s.text)}>{displayCode}</p>
+      <p className={cn("font-mono-code font-medium uppercase text-ink-muted", s.text)}>
+        {code.toUpperCase()}
+      </p>
     </div>
   );
 }
 
-export function sealStatusFromCertificate(
-  status: string,
-  isExpired?: boolean
-): SealStatus {
+export function sealStatusFromCertificate(status: string, isExpired?: boolean): SealStatus {
   if (status === "REVOKED") return "revoked";
   if (status === "EXPIRED" || isExpired) return "expired";
   return "valid";

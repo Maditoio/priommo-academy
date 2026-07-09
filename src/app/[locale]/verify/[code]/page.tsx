@@ -1,13 +1,9 @@
 import { db } from "@/lib/db";
-import {
-  VerificationSeal,
-  sealStatusFromCertificate,
-} from "@/components/public/verification-seal";
-import { StatusBadge } from "@/components/public/status-badge";
+import { generateCertificateQR } from "@/lib/qr";
+import { CertificateDisplay } from "@/components/public/certificate-display";
 import { Card, CardContent } from "@/components/ui/card";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { format } from "date-fns";
-import { fr, enUS } from "date-fns/locale";
+import { VerificationSeal } from "@/components/public/verification-seal";
 
 export default async function VerifyPage({
   params,
@@ -18,8 +14,6 @@ export default async function VerifyPage({
   setRequestLocale(locale);
 
   const t = await getTranslations("verify");
-  const ts = await getTranslations("status");
-  const dateLocale = locale === "fr" ? fr : enUS;
 
   const certificate = await db.certificateIssued.findUnique({
     where: { uniqueCode: code },
@@ -29,13 +23,13 @@ export default async function VerifyPage({
   if (!certificate) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center px-6 py-16">
-        <Card className="w-full max-w-md p-8 text-center">
+        <Card className="w-full max-w-md p-8 text-center shadow-md">
           <VerificationSeal status="revoked" code="NOT-FOUND" size="md" className="mx-auto" />
-          <h1 className="font-display mt-6 text-2xl font-semibold text-navy">{t("notFound")}</h1>
+          <h1 className="mt-6 text-xl font-semibold text-ink">{t("notFound")}</h1>
           <p className="mt-2 text-sm text-ink-muted">
             {locale === "fr"
-              ? "Ce code de vérification ne correspond à aucun certificat enregistré."
-              : "This verification code does not match any registered certificate."}
+              ? "Ce code ne correspond à aucun certificat enregistré."
+              : "This code does not match any registered certificate."}
           </p>
         </Card>
       </div>
@@ -45,7 +39,9 @@ export default async function VerifyPage({
   const isExpired = !!(certificate.expiresAt && certificate.expiresAt < new Date());
   const effectiveStatus =
     isExpired && certificate.status === "VALID" ? "EXPIRED" : certificate.status;
-  const sealStatus = sealStatusFromCertificate(effectiveStatus, isExpired);
+  const qrDataUrl = await generateCertificateQR(certificate.uniqueCode);
+  const certTitle =
+    locale === "fr" ? certificate.certification.titleFr : certificate.certification.titleEn;
 
   const statusLabels: Record<string, string> = {
     VALID: t("valid"),
@@ -53,48 +49,48 @@ export default async function VerifyPage({
     EXPIRED: t("expired"),
   };
 
-  const certTitle =
-    locale === "fr" ? certificate.certification.titleFr : certificate.certification.titleEn;
-
   return (
-    <div className="flex min-h-[60vh] items-center justify-center px-6 py-16">
-      <Card className="w-full max-w-lg overflow-hidden">
-        <div className="border-b border-navy/10 bg-navy/5 px-8 py-10 text-center">
-          <VerificationSeal
-            status={sealStatus}
-            code={certificate.uniqueCode}
-            level={certificate.certification.level}
-            size="lg"
-            className="mx-auto"
-          />
-          <h1 className="font-display mt-8 text-2xl font-semibold text-navy">{t("title")}</h1>
-          <div className="mt-3 flex justify-center">
-            <StatusBadge status={effectiveStatus} label={statusLabels[effectiveStatus]} />
-          </div>
+    <div className="px-6 py-16">
+      <div className="mx-auto max-w-lg">
+        <div className="mb-8 text-center">
+          <h1 className="text-[1.875rem] font-semibold text-ink">{t("title")}</h1>
+          <p className="mt-2 text-ink-muted">
+            {locale === "fr"
+              ? "Vérification officielle PROIMMO Academy"
+              : "Official PROIMMO Academy verification"}
+          </p>
         </div>
-        <CardContent className="space-y-0 p-0">
-          <div className="flex justify-between border-b border-navy/10 px-8 py-4">
-            <span className="text-sm text-ink-muted">{t("holder")}</span>
-            <span className="font-medium text-ink">{certificate.user.name}</span>
-          </div>
-          <div className="flex justify-between border-b border-navy/10 px-8 py-4">
-            <span className="text-sm text-ink-muted">{t("certification")}</span>
-            <span className="max-w-[60%] text-right font-medium text-ink">{certTitle}</span>
-          </div>
-          <div className="flex justify-between px-8 py-4">
-            <span className="text-sm text-ink-muted">{t("issuedAt")}</span>
-            <span className="font-medium text-ink">
-              {format(certificate.issuedAt, "PPP", { locale: dateLocale })}
-            </span>
-          </div>
-          {certificate.status === "REVOKED" && certificate.revokedReason && (
-            <div className="border-t border-clay/20 bg-clay/5 px-8 py-4 text-sm">
-              <p className="font-medium text-clay">{t("reason")}</p>
-              <p className="mt-1 text-ink-muted">{certificate.revokedReason}</p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+
+        <CertificateDisplay
+          uniqueCode={certificate.uniqueCode}
+          status={certificate.status}
+          level={certificate.certification.level}
+          title={certTitle}
+          holderName={certificate.user.name}
+          issuedAt={certificate.issuedAt.toISOString()}
+          expiresAt={certificate.expiresAt?.toISOString() ?? null}
+          qrDataUrl={qrDataUrl}
+          locale={locale}
+          statusLabel={statusLabels[effectiveStatus]}
+          labels={{
+            holder: t("holder"),
+            issuedAt: t("issuedAt"),
+            expiresAt: t("expiresAt"),
+            verify: t("viewOnline"),
+            copyLink: t("copyLink"),
+            copied: t("copied"),
+          }}
+        />
+
+        {certificate.status === "REVOKED" && certificate.revokedReason && (
+          <Card className="mt-8 border-danger/20 bg-danger/5 shadow-sm">
+            <CardContent className="pt-6">
+              <p className="font-medium text-danger">{t("reason")}</p>
+              <p className="mt-1 text-sm text-ink-muted">{certificate.revokedReason}</p>
+            </CardContent>
+          </Card>
+        )}
+      </div>
     </div>
   );
 }

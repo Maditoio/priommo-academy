@@ -1,9 +1,9 @@
 import { db } from "@/lib/db";
 import { auth } from "@/lib/auth";
-import { submitExam } from "@/actions/enrollment";
-import { updateEnrollmentProgress } from "@/actions/enrollment";
+import { submitExam, updateEnrollmentProgress } from "@/actions/enrollment";
 import { localizedField } from "@/lib/utils";
 import { generateCertificateQR } from "@/lib/qr";
+import { CertificateDisplay } from "@/components/public/certificate-display";
 import { StatusBadge } from "@/components/public/status-badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,18 +11,14 @@ import { Progress } from "@/components/ui/progress";
 import { Link } from "@/i18n/routing";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound, redirect } from "next/navigation";
-import { BookOpen, CheckCircle } from "lucide-react";
-import Image from "next/image";
+import { BookOpen } from "lucide-react";
 
 export default async function EnrollmentDetailPage({
   params,
-  searchParams,
 }: {
   params: Promise<{ locale: string; id: string }>;
-  searchParams: Promise<{ examResult?: string }>;
 }) {
   const { locale, id } = await params;
-  const sp = await searchParams;
   setRequestLocale(locale);
 
   const session = await auth();
@@ -31,6 +27,7 @@ export default async function EnrollmentDetailPage({
   const t = await getTranslations("dashboard");
   const ts = await getTranslations("status");
   const tc = await getTranslations("courses");
+  const tv = await getTranslations("verify");
 
   const enrollment = await db.enrollment.findFirst({
     where: { id, userId: session.user.id },
@@ -42,7 +39,7 @@ export default async function EnrollmentDetailPage({
             include: { lessons: { orderBy: { order: "asc" } } },
           },
           exams: true,
-          certifications: true,
+          certifications: { orderBy: { rank: "asc" } },
         },
       },
     },
@@ -50,11 +47,12 @@ export default async function EnrollmentDetailPage({
 
   if (!enrollment) notFound();
 
-  const certificate = enrollment.course.certifications[0]
+  const certification = enrollment.course.certifications[0];
+  const certificate = certification
     ? await db.certificateIssued.findFirst({
         where: {
           userId: session.user.id,
-          certificationId: enrollment.course.certifications[0].id,
+          certificationId: certification.id,
         },
       })
     : null;
@@ -66,14 +64,16 @@ export default async function EnrollmentDetailPage({
     <div className="py-12 lg:py-16">
       <div className="mx-auto max-w-7xl px-6 lg:px-12">
         <div className="mb-6">
-          <Link href="/dashboard" className="text-sm text-primary hover:underline">
+          <Link href="/dashboard" className="text-sm text-accent hover:underline">
             ← {t("title")}
           </Link>
         </div>
 
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-2xl font-bold">{localizedField(enrollment.course, "title", locale)}</h1>
+            <h1 className="text-2xl font-semibold text-ink">
+              {localizedField(enrollment.course, "title", locale)}
+            </h1>
             <div className="mt-2">
               <StatusBadge status={enrollment.status} label={ts(enrollment.status)} />
             </div>
@@ -88,10 +88,10 @@ export default async function EnrollmentDetailPage({
         </div>
 
         <div className="mt-8 grid gap-8 lg:grid-cols-3">
-          <div className="lg:col-span-2 space-y-4">
-            <h2 className="text-lg font-semibold">{tc("curriculum")}</h2>
+          <div className="space-y-4 lg:col-span-2">
+            <h2 className="text-lg font-semibold text-ink">{tc("curriculum")}</h2>
             {enrollment.course.modules.map((mod) => (
-              <Card key={mod.id}>
+              <Card key={mod.id} className="shadow-sm">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-base">{localizedField(mod, "title", locale)}</CardTitle>
                 </CardHeader>
@@ -99,7 +99,7 @@ export default async function EnrollmentDetailPage({
                   <ul className="space-y-2">
                     {mod.lessons.map((lesson) => (
                       <li key={lesson.id} className="flex items-center gap-2 text-sm">
-                        <BookOpen className="h-4 w-4 text-muted-foreground" />
+                        <BookOpen className="h-4 w-4 text-ink-muted" />
                         {localizedField(lesson, "title", locale)}
                       </li>
                     ))}
@@ -109,20 +109,13 @@ export default async function EnrollmentDetailPage({
             ))}
 
             {exam && enrollment.status !== "COMPLETED" && (
-              <Card className="border-primary/20 bg-accent/30">
+              <Card className="border-accent/20 bg-accent-soft/50 shadow-sm">
                 <CardContent className="flex items-center justify-between pt-6">
                   <div>
-                    <p className="font-medium">{localizedField(exam, "title", locale)}</p>
-                    <p className="text-sm text-muted-foreground">
-                      Score minimum: {exam.passingScore}%
-                    </p>
+                    <p className="font-medium text-ink">{localizedField(exam, "title", locale)}</p>
+                    <p className="text-sm text-ink-muted">Score minimum: {exam.passingScore}%</p>
                   </div>
-                  <form
-                    action={async () => {
-                      "use server";
-                      await submitExam(exam.id, enrollment.id, locale);
-                    }}
-                  >
+                  <form action={submitExam.bind(null, exam.id, enrollment.id, locale)}>
                     <Button type="submit">{t("takeExam")}</Button>
                   </form>
                 </CardContent>
@@ -131,31 +124,29 @@ export default async function EnrollmentDetailPage({
           </div>
 
           <div className="space-y-4">
-            {certificate && (
-              <Card className="border-emerald-200 bg-emerald-50">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-base text-emerald-800">
-                    <CheckCircle className="h-5 w-5" />
-                    {t("certificateIssued")}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="text-center">
-                  {qrDataUrl && (
-                    <Image src={qrDataUrl} alt="QR Code" width={200} height={200} className="mx-auto" />
-                  )}
-                  <Button asChild className="mt-4 w-full" variant="outline">
-                    <Link href={`/verify/${certificate.uniqueCode}`}>{t("viewCertificate")}</Link>
-                  </Button>
-                </CardContent>
-              </Card>
+            {certificate && qrDataUrl && (
+              <CertificateDisplay
+                uniqueCode={certificate.uniqueCode}
+                status={certificate.status}
+                level={certification!.level}
+                title={localizedField(certification!, "title", locale)}
+                issuedAt={certificate.issuedAt.toISOString()}
+                expiresAt={certificate.expiresAt?.toISOString() ?? null}
+                qrDataUrl={qrDataUrl}
+                locale={locale}
+                statusLabel={ts(certificate.status)}
+                compact
+                labels={{
+                  issuedAt: tv("issuedAt"),
+                  expiresAt: tv("expiresAt"),
+                  verify: t("viewCertificate"),
+                  copyLink: tv("copyLink"),
+                  copied: tv("copied"),
+                }}
+              />
             )}
 
-            <form
-              action={async () => {
-                "use server";
-                await updateEnrollmentProgress(enrollment.id, enrollment.progressPct + 25);
-              }}
-            >
+            <form action={updateEnrollmentProgress.bind(null, enrollment.id, enrollment.progressPct + 25, locale)}>
               <Button type="submit" variant="secondary" className="w-full">
                 +25% {t("progress")}
               </Button>

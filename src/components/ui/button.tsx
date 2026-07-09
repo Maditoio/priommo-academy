@@ -4,24 +4,21 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy focus-visible:ring-offset-2 focus-visible:ring-offset-paper disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
-        default: "rounded-lg bg-navy text-white hover:bg-navy-light",
-        gold: "rounded-lg bg-gold text-white hover:bg-gold/90",
-        destructive: "rounded-lg bg-clay text-white hover:bg-clay/90",
-        outline:
-          "rounded-lg border border-navy bg-transparent text-navy hover:bg-navy/5",
-        secondary: "rounded-lg border border-navy/20 bg-transparent text-navy hover:bg-navy/5",
-        ghost: "rounded-lg text-white hover:bg-white/10",
-        ghostDark: "rounded-lg text-navy hover:bg-navy/5",
-        link: "text-navy underline-offset-4 hover:underline",
+        default: "rounded-xl bg-accent text-white shadow-sm hover:opacity-90",
+        secondary: "rounded-xl border border-border bg-surface text-ink hover:bg-surface-hover",
+        ghost: "rounded-xl text-ink-muted hover:bg-surface-hover hover:text-ink",
+        destructive: "rounded-xl bg-danger text-white hover:opacity-90",
+        outline: "rounded-xl border border-border bg-surface text-ink hover:bg-surface-hover",
+        link: "text-accent underline-offset-4 hover:underline",
       },
       size: {
         default: "h-10 px-4 py-2",
-        sm: "h-9 px-3 text-sm",
-        lg: "h-11 px-8 text-base",
+        sm: "h-9 px-3",
+        lg: "h-11 px-6",
         icon: "h-10 w-10",
       },
     },

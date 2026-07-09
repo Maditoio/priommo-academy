@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Certification" ADD COLUMN     "rank" INTEGER NOT NULL DEFAULT 0,
+ADD COLUMN     "validityMonths" INTEGER NOT NULL DEFAULT 24;

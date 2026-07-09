@@ -61,7 +61,7 @@ export default async function AdminCertificatesPage({
 
   return (
     <AdminShell labels={labels} currentPath="/admin/certificates">
-      <h1 className="font-display text-3xl font-semibold tracking-tight text-navy">{ta("certificates")}</h1>
+      <h1 className="text-[1.875rem] font-semibold text-ink">{ta("certificates")}</h1>
       <div className="mt-6">
         <DataTable
           columns={[
@@ -96,7 +96,14 @@ export default async function AdminCertificatesPage({
               header: "",
               cell: (r) =>
                 r.status === "VALID" ? (
-                  <RevokeCertificateButton id={r.id} label={ta("revoke")} />
+                  <RevokeCertificateButton
+                    id={r.id}
+                    label={ta("revoke")}
+                    locale={locale}
+                    reasonLabel={ta("revokeReason")}
+                    confirmLabel={ta("revoke")}
+                    cancelLabel="Cancel"
+                  />
                 ) : null,
             },
           ]}

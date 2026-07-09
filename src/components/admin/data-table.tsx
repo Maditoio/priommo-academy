@@ -7,35 +7,38 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-export interface Column<T> {
+interface Column<T> {
   key: string;
   header: string;
   cell: (row: T) => React.ReactNode;
-  className?: string;
 }
 
-interface DataTableProps<T> {
+interface DataTableProps<T extends { id: string }> {
   columns: Column<T>[];
   data: T[];
   emptyMessage?: string;
 }
 
-export function DataTable<T extends { id: string }>({ columns, data, emptyMessage }: DataTableProps<T>) {
+export function DataTable<T extends { id: string }>({
+  columns,
+  data,
+  emptyMessage = "No results",
+}: DataTableProps<T>) {
   if (data.length === 0) {
     return (
-      <div className="rounded-[12px] border border-navy/10 bg-paper p-12 text-center text-ink-muted">
-        {emptyMessage ?? "No data"}
+      <div className="rounded-xl bg-surface p-12 text-center text-ink-muted shadow-sm">
+        {emptyMessage}
       </div>
     );
   }
 
   return (
-    <div className="overflow-hidden rounded-[12px] border border-navy/10 bg-paper">
+    <div className="overflow-hidden rounded-xl bg-surface shadow-sm">
       <Table>
         <TableHeader>
-          <TableRow className="border-navy/10 hover:bg-transparent">
+          <TableRow className="border-border hover:bg-transparent">
             {columns.map((col) => (
-              <TableHead key={col.key} className={col.className}>
+              <TableHead key={col.key} className="text-ink-muted">
                 {col.header}
               </TableHead>
             ))}
@@ -43,11 +46,9 @@ export function DataTable<T extends { id: string }>({ columns, data, emptyMessag
         </TableHeader>
         <TableBody>
           {data.map((row) => (
-            <TableRow key={row.id} className="border-navy/10 hover:bg-navy/[0.02]">
+            <TableRow key={row.id} className="border-border hover:bg-surface-hover">
               {columns.map((col) => (
-                <TableCell key={col.key} className={col.className}>
-                  {col.cell(row)}
-                </TableCell>
+                <TableCell key={col.key}>{col.cell(row)}</TableCell>
               ))}
             </TableRow>
           ))}

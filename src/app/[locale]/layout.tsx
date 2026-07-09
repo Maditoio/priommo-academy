@@ -5,7 +5,9 @@ import { routing } from "@/i18n/routing";
 import { Header } from "@/components/public/header";
 import { Footer } from "@/components/public/footer";
 import { Providers } from "@/components/providers";
+import { ToastFromUrl } from "@/components/public/toast-from-url";
 import { Toaster } from "sonner";
+import { Suspense } from "react";
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
@@ -29,6 +31,9 @@ export default async function LocaleLayout({
   return (
     <NextIntlClientProvider messages={messages}>
       <Providers>
+        <Suspense>
+          <ToastFromUrl />
+        </Suspense>
       <Header
         locale={locale}
         labels={{
@@ -40,6 +45,7 @@ export default async function LocaleLayout({
           dashboard: t("dashboard"),
           logout: t("logout"),
           admin: t("admin"),
+          verify: t("verify"),
           appName: tc("appName"),
         }}
       />

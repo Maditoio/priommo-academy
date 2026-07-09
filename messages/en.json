@@ -117,8 +117,12 @@
     "notFound": "Certificate not found",
     "holder": "Holder",
     "issuedAt": "Issued on",
+    "expiresAt": "Expires on",
     "certification": "Certification",
-    "reason": "Revocation reason"
+    "reason": "Revocation reason",
+    "viewOnline": "View online",
+    "copyLink": "Copy link",
+    "copied": "Link copied"
   },
   "admin": {
     "title": "Administration",

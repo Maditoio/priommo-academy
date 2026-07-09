@@ -138,13 +138,13 @@ export default async function CourseDetailPage({
                         await enrollInCourse(course.id, locale);
                       }}
                     >
-                      <Button type="submit" className="mt-6 w-full" size="lg" variant="gold">
+                      <Button type="submit" className="mt-6 w-full" size="lg">
                         {t("enroll")}
                       </Button>
                     </form>
                   )
                 ) : (
-                  <Button className="mt-6 w-full" size="lg" variant="gold" asChild>
+                  <Button className="mt-6 w-full" size="lg" asChild>
                     <a href={`/${locale}/login`}>{t("enroll")}</a>
                   </Button>
                 )}

@@ -32,18 +32,18 @@ export default async function HomePage({
 
   return (
     <>
-      <section className="hero-gradient text-white">
+      <section className="hero-band">
         <div className="mx-auto max-w-7xl px-6 py-20 lg:px-12 lg:py-32">
           <div className="max-w-2xl">
-            <p className="text-sm font-medium uppercase tracking-widest text-gold-light">
+            <p className="text-sm font-medium uppercase tracking-widest text-white/70">
               PROIMMO Academy
             </p>
-            <h1 className="font-display mt-4 text-4xl font-semibold tracking-tight sm:text-5xl lg:text-[3.5rem] lg:leading-[1.1]">
+            <h1 className="mt-4 text-4xl font-semibold sm:text-5xl lg:text-[3.5rem] lg:leading-[1.1]">
               {t("heroTitle")}
             </h1>
             <p className="mt-6 text-lg text-white/80">{t("heroSubtitle")}</p>
             <div className="mt-10 flex flex-wrap gap-4">
-              <Button asChild size="lg" variant="gold">
+              <Button asChild size="lg" className="bg-white text-accent hover:bg-white/90">
                 <Link href="/courses">
                   {t("ctaCourses")}
                   <ArrowRight className="ml-2 h-4 w-4" />
@@ -52,8 +52,8 @@ export default async function HomePage({
               <Button
                 asChild
                 size="lg"
-                variant="outline"
-                className="border-white/40 text-white hover:bg-white/10"
+                variant="secondary"
+                className="border-white/40 bg-white/10 text-white hover:bg-white/20"
               >
                 <Link href="/certifications">{t("ctaCertifications")}</Link>
               </Button>
@@ -64,9 +64,7 @@ export default async function HomePage({
 
       <section className="py-16 lg:py-24">
         <div className="mx-auto max-w-7xl px-6 lg:px-12">
-          <h2 className="font-display text-3xl font-semibold tracking-tight text-navy sm:text-4xl">
-            {t("featuredCourses")}
-          </h2>
+          <h2 className="text-3xl font-semibold text-ink sm:text-4xl">{t("featuredCourses")}</h2>
           {featuredCourses.length > 0 ? (
             <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {featuredCourses.map((course) => (
@@ -86,20 +84,18 @@ export default async function HomePage({
         </div>
       </section>
 
-      <section className="border-t border-navy/10 py-16 lg:py-24">
+      <section className="border-t border-border py-16 lg:py-24">
         <div className="mx-auto max-w-7xl px-6 lg:px-12">
-          <h2 className="font-display text-3xl font-semibold tracking-tight text-navy">
-            {t("howItWorks")}
-          </h2>
+          <h2 className="text-3xl font-semibold text-ink">{t("howItWorks")}</h2>
           <div className="mt-12 grid gap-10 md:grid-cols-3">
             {steps.map((step, i) => {
               const Icon = step.icon;
               return (
                 <div key={i} className="flex flex-col">
-                  <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg border border-gold/30 bg-gold/5">
-                    <Icon className="h-6 w-6 text-gold" />
+                  <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-accent-soft">
+                    <Icon className="h-6 w-6 text-accent" />
                   </div>
-                  <h3 className="font-display text-xl font-semibold text-navy">{step.title}</h3>
+                  <h3 className="text-xl font-semibold text-ink">{step.title}</h3>
                   <p className="mt-2 text-ink-muted">{step.desc}</p>
                 </div>
               );

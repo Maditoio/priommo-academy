@@ -48,6 +48,8 @@ export const lessonSchema = z.object({
 export const certificationSchema = bilingualTextSchema.extend({
   slug: z.string().min(1).regex(/^[a-z0-9-]+$/),
   level: z.string().min(1),
+  rank: z.coerce.number().int().min(0).default(0),
+  validityMonths: z.coerce.number().int().min(1).max(120).default(24),
   courseId: z.string().optional().nullable(),
 });
 

@@ -117,8 +117,12 @@
     "notFound": "Certificat introuvable",
     "holder": "Titulaire",
     "issuedAt": "Délivré le",
+    "expiresAt": "Expire le",
     "certification": "Certification",
-    "reason": "Motif de révocation"
+    "reason": "Motif de révocation",
+    "viewOnline": "Voir en ligne",
+    "copyLink": "Copier le lien",
+    "copied": "Lien copié"
   },
   "admin": {
     "title": "Administration",

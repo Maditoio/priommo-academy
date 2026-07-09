@@ -25,7 +25,7 @@ export default async function CertificationsPage({
     db.certification.findMany({
       skip: (page - 1) * pageSize,
       take: pageSize,
-      orderBy: { createdAt: "desc" },
+      orderBy: { rank: "asc" },
       include: { course: { select: { slug: true, titleFr: true, titleEn: true } } },
     }),
     db.certification.count(),
@@ -35,7 +35,7 @@ export default async function CertificationsPage({
     <div className="py-12 lg:py-16">
       <div className="mx-auto max-w-7xl px-6 lg:px-12">
         <div className="mb-8">
-          <h1 className="font-display text-4xl font-semibold tracking-tight text-navy">{t("title")}</h1>
+          <h1 className="text-[1.875rem] font-semibold text-ink sm:text-4xl">{t("title")}</h1>
           <p className="mt-2 text-ink-muted">{t("subtitle")}</p>
         </div>
 
@@ -52,7 +52,7 @@ export default async function CertificationsPage({
             ))}
           </div>
         ) : (
-          <p className="py-12 text-center text-muted-foreground">{t("noCertifications")}</p>
+          <p className="py-12 text-center text-ink-muted">{t("noCertifications")}</p>
         )}
 
         <div className="mt-8">

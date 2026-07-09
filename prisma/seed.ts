@@ -165,7 +165,7 @@ async function main() {
 
   const certification = await prisma.certification.upsert({
     where: { slug: "cert-agent-immobilier" },
-    update: {},
+    update: { rank: 1, validityMonths: 24 },
     create: {
       slug: "cert-agent-immobilier",
       titleFr: "Certificat Agent Immobilier Certifié",
@@ -175,7 +175,39 @@ async function main() {
       descriptionEn:
         "Official certification attesting mastery of real estate fundamentals in DRC.",
       level: "Débutant",
+      rank: 1,
+      validityMonths: 24,
       courseId: course1.id,
+    },
+  });
+
+  const certificationPro = await prisma.certification.upsert({
+    where: { slug: "cert-gestionnaire-professionnel" },
+    update: { rank: 2, validityMonths: 36 },
+    create: {
+      slug: "cert-gestionnaire-professionnel",
+      titleFr: "Certificat Gestionnaire Immobilier Professionnel",
+      titleEn: "Professional Property Manager Certificate",
+      descriptionFr:
+        "Certification avancée pour les gestionnaires de portefeuille et directeurs d'agence.",
+      descriptionEn:
+        "Advanced certification for portfolio managers and agency directors.",
+      level: "Professionnel",
+      rank: 2,
+      validityMonths: 36,
+      courseId: course2.id,
+    },
+  });
+
+  await prisma.exam.upsert({
+    where: { id: "seed-exam-2" },
+    update: {},
+    create: {
+      id: "seed-exam-2",
+      courseId: course2.id,
+      titleFr: "Examen final — Gestion professionnelle",
+      titleEn: "Final Exam — Professional Management",
+      passingScore: 75,
     },
   });
 
@@ -183,7 +215,7 @@ async function main() {
   console.log("  Admin: admin@proimmo.cd / admin123");
   console.log("  Learner: learner@proimmo.cd / learner123");
   console.log(`  Courses: ${course1.slug}, ${course2.slug}`);
-  console.log(`  Certification: ${certification.slug}`);
+  console.log(`  Certification: ${certification.slug}, ${certificationPro.slug}`);
 }
 
 main()

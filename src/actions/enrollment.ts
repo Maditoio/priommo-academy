@@ -5,6 +5,7 @@ import { db } from "@/lib/db";
 import { initiatePayment, enrollInFreeCourse, confirmPayment } from "@/lib/payments";
 import { issueCertificateOnExamPass, revokeCertificate } from "@/lib/certificates";
 import { requireAdmin } from "@/lib/auth";
+import { adminRedirect } from "@/lib/admin-redirect";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
@@ -22,7 +23,7 @@ export async function enrollInCourse(courseId: string, locale: string) {
   const price = parseFloat(course.price.toString());
   if (price === 0) {
     const enrollment = await enrollInFreeCourse(session.user.id, courseId);
-    redirect(`/${locale}/dashboard/enrollments/${enrollment.id}`);
+    redirect(`/${locale}/dashboard/enrollments/${enrollment.id}?toast=success&msg=${encodeURIComponent("Enrolled successfully")}`);
   }
 
   const payment = await initiatePayment({
@@ -40,14 +41,14 @@ export async function processMockPayment(paymentId: string, success: boolean, lo
   await requireAuth();
   await confirmPayment(paymentId, success);
   if (success) {
-    redirect(`/${locale}/dashboard`);
+    adminRedirect(`/${locale}/dashboard`, "Payment confirmed — you are enrolled!");
   }
-  redirect(`/${locale}/payment/${paymentId}?failed=1`);
+  adminRedirect(`/${locale}/payment/${paymentId}?failed=1`, "Payment failed", "error");
 }
 
 export async function submitExam(examId: string, enrollmentId: string, locale: string) {
   const session = await requireAuth();
-  const score = 85; // MVP: simulated passing score
+  const score = 85;
   const result = await issueCertificateOnExamPass({
     userId: session.user.id,
     examId,
@@ -56,17 +57,23 @@ export async function submitExam(examId: string, enrollmentId: string, locale: s
 
   revalidatePath(`/${locale}/dashboard`);
   revalidatePath(`/${locale}/dashboard/enrollments/${enrollmentId}`);
-  return result;
+
+  if (result.certificate) {
+    adminRedirect(
+      `/${locale}/dashboard/enrollments/${enrollmentId}`,
+      "Exam passed — certificate issued!"
+    );
+  }
+  adminRedirect(`/${locale}/dashboard/enrollments/${enrollmentId}`, "Exam completed", "success");
 }
 
-export async function revokeCertificateAction(id: string, reason: string) {
+export async function revokeCertificateAction(id: string, reason: string, locale: string) {
   await requireAdmin();
   await revokeCertificate(id, reason);
-  revalidatePath("/admin/certificates");
-  return { success: true };
+  revalidatePath(`/${locale}/admin/certificates`);
 }
 
-export async function createOrganization(formData: FormData) {
+export async function createOrganization(locale: string, formData: FormData) {
   await requireAdmin();
   const name = String(formData.get("name") ?? "");
   const type = String(formData.get("type") ?? "");
@@ -74,10 +81,11 @@ export async function createOrganization(formData: FormData) {
   const seats = Number(formData.get("seats") ?? 0);
 
   await db.organization.create({ data: { name, type, contactEmail, seats } });
-  revalidatePath("/admin/organizations");
+  revalidatePath(`/${locale}/admin/organizations`);
+  adminRedirect(`/${locale}/admin/organizations`, "Organization created");
 }
 
-export async function updateEnrollmentProgress(enrollmentId: string, progressPct: number) {
+export async function updateEnrollmentProgress(enrollmentId: string, progressPct: number, locale: string) {
   const session = await auth();
   if (!session?.user) throw new Error("Unauthorized");
 
@@ -85,6 +93,6 @@ export async function updateEnrollmentProgress(enrollmentId: string, progressPct
     where: { id: enrollmentId, userId: session.user.id },
     data: { progressPct: Math.min(100, Math.max(0, progressPct)) },
   });
-  revalidatePath("/dashboard");
-  return { success: true };
+  revalidatePath(`/${locale}/dashboard`);
+  adminRedirect(`/${locale}/dashboard/enrollments/${enrollmentId}`, "Progress updated");
 }

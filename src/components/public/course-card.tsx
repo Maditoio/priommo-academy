@@ -25,20 +25,20 @@ interface CourseCardProps {
   freeLabel: string;
 }
 
-export function CourseCard({ course, locale, enrollLabel, levelLabel, freeLabel }: CourseCardProps) {
+export function CourseCard({ course, locale, enrollLabel, freeLabel }: CourseCardProps) {
   const title = localizedField(course, "title", locale);
   const description = localizedField(course, "description", locale);
   const price = parseFloat(course.price.toString());
   const isFree = price === 0;
 
   return (
-    <Card className="flex flex-col overflow-hidden transition-colors hover:border-navy/25">
-      <div className="relative aspect-[16/9] bg-navy/5">
+    <Card className="card-surface flex flex-col overflow-hidden">
+      <div className="relative aspect-[16/9] bg-surface-hover">
         {course.imageUrl ? (
           <Image src={course.imageUrl} alt={title} fill className="object-cover" />
         ) : (
           <div className="flex h-full items-center justify-center">
-            <BookOpen className="h-12 w-12 text-navy/20" />
+            <BookOpen className="h-12 w-12 text-ink-muted/30" />
           </div>
         )}
         <Badge variant="level" className="absolute left-3 top-3">
@@ -51,11 +51,11 @@ export function CourseCard({ course, locale, enrollLabel, levelLabel, freeLabel 
       <CardContent className="flex-1">
         <p className="line-clamp-3 text-sm text-ink-muted">{description}</p>
       </CardContent>
-      <CardFooter className="flex items-center justify-between border-t border-navy/10 pt-4">
-        <span className="font-display text-lg font-semibold text-navy">
+      <CardFooter className="flex items-center justify-between border-t border-border pt-4">
+        <span className="text-lg font-semibold text-ink">
           {isFree ? freeLabel : formatPrice(price, course.currency, locale)}
         </span>
-        <Button asChild size="sm" variant="outline">
+        <Button asChild size="sm" variant="secondary">
           <Link href={`/courses/${course.slug}`}>{enrollLabel}</Link>
         </Button>
       </CardFooter>

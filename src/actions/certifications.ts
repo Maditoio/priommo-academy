@@ -3,10 +3,10 @@
 import { db } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth";
 import { certificationSchema } from "@/lib/validation";
+import { adminRedirect } from "@/lib/admin-redirect";
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 
-export async function createCertification(formData: FormData) {
+export async function createCertification(formData: FormData, locale: string) {
   await requireAdmin();
 
   const raw = Object.fromEntries(formData.entries());
@@ -14,20 +14,22 @@ export async function createCertification(formData: FormData) {
     ...raw,
     courseId: raw.courseId || null,
   });
-  if (!parsed.success) return;
+  if (!parsed.success) {
+    adminRedirect(`/${locale}/admin/certifications`, "Invalid certification data", "error");
+  }
 
-  const cert = await db.certification.create({
+  await db.certification.create({
     data: {
-      ...parsed.data,
-      courseId: parsed.data.courseId || null,
+      ...parsed.data!,
+      courseId: parsed.data!.courseId || null,
     },
   });
 
-  revalidatePath("/admin/certifications");
-  redirect(`/admin/certifications/${cert.id}`);
+  revalidatePath(`/${locale}/admin/certifications`);
+  adminRedirect(`/${locale}/admin/certifications`, "Certification created successfully");
 }
 
-export async function updateCertification(id: string, formData: FormData) {
+export async function updateCertification(id: string, formData: FormData, locale: string) {
   await requireAdmin();
 
   const raw = Object.fromEntries(formData.entries());
@@ -35,16 +37,29 @@ export async function updateCertification(id: string, formData: FormData) {
     ...raw,
     courseId: raw.courseId || null,
   });
-  if (!parsed.success) return;
+  if (!parsed.success) {
+    adminRedirect(`/${locale}/admin/certifications`, "Invalid certification data", "error");
+  }
 
   await db.certification.update({
     where: { id },
     data: {
-      ...parsed.data,
-      courseId: parsed.data.courseId || null,
+      ...parsed.data!,
+      courseId: parsed.data!.courseId || null,
     },
   });
 
-  revalidatePath("/admin/certifications");
-  revalidatePath(`/admin/certifications/${id}`);
+  revalidatePath(`/${locale}/admin/certifications`);
+  adminRedirect(`/${locale}/admin/certifications`, "Certification updated successfully");
+}
+
+export async function deleteCertification(id: string, locale: string) {
+  await requireAdmin();
+  const issued = await db.certificateIssued.count({ where: { certificationId: id } });
+  if (issued > 0) {
+    adminRedirect(`/${locale}/admin/certifications`, "Cannot delete — certificates already issued", "error");
+  }
+  await db.certification.delete({ where: { id } });
+  revalidatePath(`/${locale}/admin/certifications`);
+  adminRedirect(`/${locale}/admin/certifications`, "Certification deleted");
 }

@@ -11,6 +11,7 @@ interface HeaderProps {
     home: string;
     courses: string;
     certifications: string;
+    verify: string;
     login: string;
     register: string;
     dashboard: string;
@@ -24,21 +25,23 @@ export async function Header({ locale, labels }: HeaderProps) {
   const session = await auth();
 
   return (
-    <header className="sticky top-0 z-50 bg-navy text-white">
+    <header className="sticky top-0 z-50 border-b border-border/50 bg-surface shadow-sm">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6 lg:px-12">
         <Link href="/" className="flex items-center gap-2.5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-full border border-gold/40 bg-navy-light">
-            <Award className="h-5 w-5 text-gold" />
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-accent-soft">
+            <Award className="h-5 w-5 text-accent" />
           </div>
-          <span className="font-display hidden text-lg font-semibold tracking-tight sm:inline">
-            {labels.appName}
-          </span>
+          <span className="hidden text-lg font-semibold text-ink sm:inline">{labels.appName}</span>
         </Link>
 
-        <NavLinks courses={labels.courses} certifications={labels.certifications} />
+        <NavLinks
+          courses={labels.courses}
+          certifications={labels.certifications}
+          verify={labels.verify}
+        />
 
         <div className="flex items-center gap-2">
-          <LanguageSwitcher dark />
+          <LanguageSwitcher />
           {session?.user ? (
             <>
               {session.user.role === "ADMIN" && (
@@ -55,7 +58,7 @@ export async function Header({ locale, labels }: HeaderProps) {
                   await signOut({ redirectTo: `/${locale}` });
                 }}
               >
-                <Button type="submit" variant="outline" size="sm" className="border-white/30 text-white hover:bg-white/10">
+                <Button type="submit" variant="secondary" size="sm">
                   {labels.logout}
                 </Button>
               </form>
@@ -65,7 +68,7 @@ export async function Header({ locale, labels }: HeaderProps) {
               <Button asChild variant="ghost" size="sm">
                 <Link href="/login">{labels.login}</Link>
               </Button>
-              <Button asChild variant="gold" size="sm">
+              <Button asChild size="sm">
                 <Link href="/register">{labels.register}</Link>
               </Button>
             </>

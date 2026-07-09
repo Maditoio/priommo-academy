@@ -50,11 +50,11 @@ export default async function AdminOrganizationsPage({
 
   return (
     <AdminShell labels={labels} currentPath="/admin/organizations">
-      <h1 className="font-display text-3xl font-semibold tracking-tight text-navy">{ta("organizations")}</h1>
+      <h1 className="text-[1.875rem] font-semibold text-ink">{ta("organizations")}</h1>
 
-      <Card className="mt-6">
+      <Card className="mt-6 shadow-sm">
         <CardContent className="pt-6">
-          <form action={createOrganization} className="grid gap-4 sm:grid-cols-2">
+          <form action={createOrganization.bind(null, locale)} className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label>Name</Label>
               <Input name="name" required />

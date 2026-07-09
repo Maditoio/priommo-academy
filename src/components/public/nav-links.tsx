@@ -6,14 +6,16 @@ import { cn } from "@/lib/utils";
 interface NavLinksProps {
   courses: string;
   certifications: string;
+  verify: string;
 }
 
-export function NavLinks({ courses, certifications }: NavLinksProps) {
+export function NavLinks({ courses, certifications, verify }: NavLinksProps) {
   const pathname = usePathname();
 
   const links = [
     { href: "/courses", label: courses },
     { href: "/certifications", label: certifications },
+    { href: "/verify", label: verify },
   ];
 
   return (
@@ -25,8 +27,8 @@ export function NavLinks({ courses, certifications }: NavLinksProps) {
             key={link.href}
             href={link.href}
             className={cn(
-              "relative py-1 text-sm font-medium text-white/80 transition-colors hover:text-white",
-              isActive && "text-white after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full after:bg-gold"
+              "relative py-1 text-sm font-medium text-ink-muted transition-colors hover:text-ink",
+              isActive && "text-accent"
             )}
           >
             {link.label}

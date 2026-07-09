@@ -2,6 +2,12 @@ import { db } from "@/lib/db";
 import { generateCertificateQR } from "@/lib/qr";
 import { nanoid } from "nanoid";
 
+function computeExpiresAt(validityMonths: number): Date {
+  const d = new Date();
+  d.setMonth(d.getMonth() + validityMonths);
+  return d;
+}
+
 export async function issueCertificateOnExamPass(params: {
   userId: string;
   examId: string;
@@ -12,7 +18,7 @@ export async function issueCertificateOnExamPass(params: {
     include: {
       course: {
         include: {
-          certifications: true,
+          certifications: { orderBy: { rank: "asc" } },
           enrollments: { where: { userId: params.userId } },
         },
       },
@@ -48,10 +54,13 @@ export async function issueCertificateOnExamPass(params: {
   });
 
   if (existing) {
-    return { attempt, certificate: existing, qrDataUrl: null };
+    const qrDataUrl = await generateCertificateQR(existing.uniqueCode);
+    return { attempt, certificate: existing, qrDataUrl };
   }
 
   const uniqueCode = nanoid(10);
+  const expiresAt = computeExpiresAt(certification.validityMonths);
+
   const certificate = await db.$transaction(async (tx) => {
     const cert = await tx.certificateIssued.create({
       data: {
@@ -59,6 +68,7 @@ export async function issueCertificateOnExamPass(params: {
         certificationId: certification.id,
         userId: params.userId,
         status: "VALID",
+        expiresAt,
       },
       include: { certification: true, user: true },
     });

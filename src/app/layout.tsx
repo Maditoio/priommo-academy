@@ -1,23 +1,15 @@
 import type { Metadata } from "next";
-import { Fraunces, IBM_Plex_Mono, Public_Sans } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
-const fraunces = Fraunces({
+const geistSans = Geist({
   subsets: ["latin"],
-  variable: "--font-display",
-  weight: ["400", "500", "600", "700"],
+  variable: "--font-geist-sans",
 });
 
-const publicSans = Public_Sans({
+const geistMono = Geist_Mono({
   subsets: ["latin"],
-  variable: "--font-body",
-  weight: ["400", "500", "600"],
-});
-
-const ibmPlexMono = IBM_Plex_Mono({
-  subsets: ["latin"],
-  variable: "--font-mono",
-  weight: ["400", "500", "600"],
+  variable: "--font-geist-mono",
 });
 
 export const metadata: Metadata = {
@@ -30,9 +22,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html
-      className={`${fraunces.variable} ${publicSans.variable} ${ibmPlexMono.variable} h-full`}
-    >
+    <html className={`${geistSans.variable} ${geistMono.variable} h-full`}>
       <body className="min-h-full flex flex-col antialiased">{children}</body>
     </html>
   );

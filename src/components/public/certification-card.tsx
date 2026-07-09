@@ -13,6 +13,7 @@ interface CertificationCardProps {
     descriptionFr: string;
     descriptionEn: string;
     level: string;
+    rank?: number;
     course?: { slug: string; titleFr: string; titleEn: string } | null;
   };
   locale: string;
@@ -20,16 +21,12 @@ interface CertificationCardProps {
   levelLabel: string;
 }
 
-export function CertificationCard({
-  certification,
-  locale,
-  viewLabel,
-}: CertificationCardProps) {
+export function CertificationCard({ certification, locale, viewLabel }: CertificationCardProps) {
   const title = localizedField(certification, "title", locale);
   const description = localizedField(certification, "description", locale);
 
   return (
-    <Card className="flex flex-col transition-colors hover:border-navy/25">
+    <Card className="card-surface flex flex-col">
       <CardHeader className="items-center pb-2 text-center">
         <VerificationSeal
           status="valid"
@@ -46,7 +43,7 @@ export function CertificationCard({
         <p className="line-clamp-3 text-sm text-ink-muted">{description}</p>
       </CardContent>
       <CardFooter className="justify-center pb-6">
-        <Button asChild variant="outline" className="w-full max-w-xs">
+        <Button asChild variant="secondary" className="w-full max-w-xs">
           <Link href={`/certifications/${certification.slug}`}>{viewLabel}</Link>
         </Button>
       </CardFooter>
