@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth";
 import { courseSchema, moduleSchema, lessonSchema } from "@/lib/validation";
 import { adminRedirect } from "@/lib/admin-redirect";
+import { uniqueCourseSlug } from "@/lib/slug";
 import { revalidatePath } from "next/cache";
 
 export async function createCourse(formData: FormData, locale: string) {
@@ -19,9 +20,12 @@ export async function createCourse(formData: FormData, locale: string) {
     adminRedirect(`/${locale}/admin/courses`, "Invalid course data", "error");
   }
 
+  const slug = await uniqueCourseSlug(parsed.data!.titleFr);
+
   await db.course.create({
     data: {
       ...parsed.data!,
+      slug,
       imageUrl: parsed.data!.imageUrl || null,
     },
   });
@@ -43,10 +47,13 @@ export async function updateCourse(id: string, formData: FormData, locale: strin
     adminRedirect(`/${locale}/admin/courses`, "Invalid course data", "error");
   }
 
+  const slug = await uniqueCourseSlug(parsed.data!.titleFr, id);
+
   await db.course.update({
     where: { id },
     data: {
       ...parsed.data!,
+      slug,
       imageUrl: parsed.data!.imageUrl || null,
     },
   });

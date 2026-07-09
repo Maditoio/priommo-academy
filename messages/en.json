@@ -96,9 +96,12 @@
     "invalidCredentials": "Invalid credentials"
   },
   "dashboard": {
-    "title": "My dashboard",
-    "myEnrollments": "My enrollments",
-    "myCertificates": "My certificates",
+    "learnerSpace": "Learner",
+    "overview": "Overview",
+    "myEnrollments": "My courses",
+    "myCertificates": "Certificates",
+    "browseCourses": "Browse courses",
+    "viewAll": "View all",
     "progress": "Progress",
     "status": "Status",
     "enrolledAt": "Enrolled on",

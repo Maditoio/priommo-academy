@@ -4,6 +4,7 @@ import { requireAdmin } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { adminRedirect } from "@/lib/admin-redirect";
 import { levelSchema } from "@/lib/validation";
+import { uniqueLevelSlug } from "@/lib/slug";
 import { revalidatePath } from "next/cache";
 
 export async function createLevel(formData: FormData, locale: string) {
@@ -13,7 +14,8 @@ export async function createLevel(formData: FormData, locale: string) {
     adminRedirect(`/${locale}/admin/levels`, "Invalid level data", "error");
   }
 
-  await db.certificationLevel.create({ data: parsed.data! });
+  const slug = await uniqueLevelSlug(parsed.data!.nameFr);
+  await db.certificationLevel.create({ data: { ...parsed.data!, slug } });
   revalidatePath(`/${locale}/admin/levels`);
   adminRedirect(`/${locale}/admin/levels`, "Level created");
 }
@@ -25,7 +27,8 @@ export async function updateLevel(id: string, formData: FormData, locale: string
     adminRedirect(`/${locale}/admin/levels`, "Invalid level data", "error");
   }
 
-  await db.certificationLevel.update({ where: { id }, data: parsed.data! });
+  const slug = await uniqueLevelSlug(parsed.data!.nameFr, id);
+  await db.certificationLevel.update({ where: { id }, data: { ...parsed.data!, slug } });
   revalidatePath(`/${locale}/admin/levels`);
   adminRedirect(`/${locale}/admin/levels`, "Level updated");
 }

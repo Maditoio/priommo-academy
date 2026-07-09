@@ -41,6 +41,8 @@ export default async function AdminCoursesPage({
         OR: [
           { titleFr: { contains: sp.search, mode: "insensitive" as const } },
           { titleEn: { contains: sp.search, mode: "insensitive" as const } },
+          { titleFr: { contains: sp.search, mode: "insensitive" as const } },
+          { titleEn: { contains: sp.search, mode: "insensitive" as const } },
           { slug: { contains: sp.search, mode: "insensitive" as const } },
         ],
       }
@@ -107,7 +109,7 @@ export default async function AdminCoursesPage({
         <DataTable
           columns={[
             { key: "title", header: ta("titleFr"), cell: (r) => r.titleFr },
-            { key: "slug", header: ta("slug"), cell: (r) => r.slug },
+            { key: "titleFr", header: ta("titleFr"), cell: (r) => r.titleFr },
             { key: "level", header: ta("level"), cell: (r) => r.level.nameFr },
             {
               key: "price",

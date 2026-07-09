@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth";
 import { certificationSchema } from "@/lib/validation";
 import { adminRedirect } from "@/lib/admin-redirect";
+import { uniqueCertificationSlug } from "@/lib/slug";
 import { revalidatePath } from "next/cache";
 
 export async function createCertification(formData: FormData, locale: string) {
@@ -18,9 +19,12 @@ export async function createCertification(formData: FormData, locale: string) {
     adminRedirect(`/${locale}/admin/certifications`, "Invalid certification data", "error");
   }
 
+  const slug = await uniqueCertificationSlug(parsed.data!.titleFr);
+
   await db.certification.create({
     data: {
       ...parsed.data!,
+      slug,
       courseId: parsed.data!.courseId || null,
     },
   });
@@ -41,10 +45,13 @@ export async function updateCertification(id: string, formData: FormData, locale
     adminRedirect(`/${locale}/admin/certifications`, "Invalid certification data", "error");
   }
 
+  const slug = await uniqueCertificationSlug(parsed.data!.titleFr, id);
+
   await db.certification.update({
     where: { id },
     data: {
       ...parsed.data!,
+      slug,
       courseId: parsed.data!.courseId || null,
     },
   });

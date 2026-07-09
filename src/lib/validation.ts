@@ -25,7 +25,6 @@ export const bilingualTextSchema = z.object({
 });
 
 export const courseSchema = bilingualTextSchema.extend({
-  slug: z.string().min(1).regex(/^[a-z0-9-]+$/),
   levelId: z.string().min(1),
   price: z.coerce.number().min(0),
   currency: z.string().default("USD"),
@@ -51,14 +50,12 @@ export const lessonSchema = z.object({
 });
 
 export const levelSchema = z.object({
-  slug: z.string().min(1).regex(/^[a-z0-9-]+$/),
   nameFr: z.string().min(1),
   nameEn: z.string().min(1),
   rank: z.coerce.number().int().min(0).default(0),
 });
 
 export const certificationSchema = bilingualTextSchema.extend({
-  slug: z.string().min(1).regex(/^[a-z0-9-]+$/),
   levelId: z.string().min(1),
   rank: z.coerce.number().int().min(0).default(0),
   validityMonths: z.coerce.number().int().min(1).max(120).default(24),
@@ -85,7 +82,6 @@ export const examSchema = z.object({
 export const examCategorySchema = z.object({
   nameFr: z.string().min(1),
   nameEn: z.string().min(1),
-  slug: z.string().min(1).regex(/^[a-z0-9-]+$/),
 });
 
 export const examCategoryReqSchema = z.object({

@@ -467,10 +467,6 @@ function CategoriesTab({
               <Label className="text-xs">{labels.nameEn}</Label>
               <Input name="nameEn" required />
             </div>
-            <div className="space-y-1.5">
-              <Label className="text-xs">{labels.slug}</Label>
-              <Input name="slug" placeholder="e.g. juridique" required />
-            </div>
             <Button type="submit" className="w-full">
               {labels.addCategory}
             </Button>

@@ -47,10 +47,6 @@ export function LevelsAdmin({ locale, editLevel, labels }: LevelsAdminProps) {
           className="mt-6 space-y-4"
         >
           <div className="space-y-2">
-            <Label htmlFor="slug">Slug</Label>
-            <Input id="slug" name="slug" defaultValue={level?.slug} required />
-          </div>
-          <div className="space-y-2">
             <Label htmlFor="nameFr">Name (FR)</Label>
             <Input id="nameFr" name="nameFr" defaultValue={level?.nameFr} required />
           </div>

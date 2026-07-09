@@ -13,8 +13,6 @@ interface HeaderProps {
     verify: string;
     login: string;
     register: string;
-    dashboard: string;
-    admin: string;
     appName: string;
   };
 }
@@ -23,12 +21,7 @@ export async function Header({ labels }: HeaderProps) {
   const session = await auth();
 
   const extraLinks = session?.user
-    ? [
-        { href: "/dashboard", label: labels.dashboard },
-        ...(session.user.role === "ADMIN"
-          ? [{ href: "/admin", label: labels.admin }]
-          : []),
-      ]
+    ? []
     : [
         { href: "/login", label: labels.login },
         { href: "/register", label: labels.register },

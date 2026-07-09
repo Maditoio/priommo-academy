@@ -91,7 +91,7 @@ export default async function EnrollmentDetailPage({
       <div className="mx-auto max-w-7xl px-6 lg:px-12">
         <div className="mb-6">
           <Link href="/dashboard" className="text-sm text-accent hover:underline">
-            ← {t("title")}
+            ← {t("overview")}
           </Link>
         </div>
 

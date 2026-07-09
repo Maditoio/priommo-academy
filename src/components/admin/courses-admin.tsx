@@ -70,10 +70,6 @@ export function CoursesAdmin({ locale, labels, levels, editCourse }: CoursesAdmi
           />
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="slug">{labels.slug}</Label>
-              <Input id="slug" name="slug" defaultValue={course?.slug} required />
-            </div>
-            <div className="space-y-2">
               <Label htmlFor="levelId">{labels.level}</Label>
               <select
                 id="levelId"

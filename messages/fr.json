@@ -96,9 +96,12 @@
     "invalidCredentials": "Identifiants incorrects"
   },
   "dashboard": {
-    "title": "Mon espace",
-    "myEnrollments": "Mes inscriptions",
-    "myCertificates": "Mes certificats",
+    "learnerSpace": "Apprenant",
+    "overview": "Aperçu",
+    "myEnrollments": "Mes cours",
+    "myCertificates": "Certificats",
+    "browseCourses": "Parcourir les cours",
+    "viewAll": "Tout voir",
     "progress": "Progression",
     "status": "Statut",
     "enrolledAt": "Inscrit le",

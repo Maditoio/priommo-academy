@@ -25,8 +25,7 @@ export default async function ProfilePage({
   });
 
   return (
-    <div className="px-4 py-12 sm:px-6 lg:py-16">
-      <ProfileForm
+    <ProfileForm
         locale={locale}
         user={user}
         labels={{
@@ -45,6 +44,5 @@ export default async function ProfilePage({
           accountSection: t("accountSection"),
         }}
       />
-    </div>
   );
 }

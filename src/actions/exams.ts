@@ -12,6 +12,7 @@ import {
 } from "@/lib/validation";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { uniqueCategorySlug } from "@/lib/slug";
 import type { ExamAttemptMode } from "@prisma/client";
 
 export async function addExam(courseId: string, formData: FormData, locale: string) {
@@ -78,8 +79,10 @@ export async function addExamCategory(courseId: string, formData: FormData, loca
   if (!parsed.success) return;
   const data = parsed.data;
 
+  const slug = await uniqueCategorySlug(courseId, data.nameFr);
+
   await db.examCategory.create({
-    data: { ...data, courseId },
+    data: { ...data, slug, courseId },
   });
   revalidatePath(`/${locale}/admin/courses/${courseId}`);
   adminRedirect(`/${locale}/admin/courses/${courseId}`, "Category added");

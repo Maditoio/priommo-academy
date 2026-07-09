@@ -4,7 +4,6 @@ import { localizedField } from "@/lib/utils";
 import { levelName } from "@/lib/levels";
 import { generateCertificateQR } from "@/lib/qr";
 import { CertificateDisplay } from "@/components/public/certificate-display";
-import { Link } from "@/i18n/routing";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { redirect } from "next/navigation";
 
@@ -45,15 +44,10 @@ export default async function CertificatesPage({
   );
 
   return (
-    <div className="py-12 lg:py-16">
-      <div className="mx-auto max-w-7xl px-6 lg:px-12">
-        <Link href="/dashboard" className="text-sm text-accent hover:underline">
-          ← {t("title")}
-        </Link>
-        <h1 className="mt-4 text-[1.875rem] font-semibold text-ink sm:text-4xl">{t("myCertificates")}</h1>
-
-        {items.length > 0 ? (
-          <div className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+    <div>
+      <h1 className="text-xl font-semibold text-ink">{t("myCertificates")}</h1>
+      {items.length > 0 ? (
+        <div className="mt-6 grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
             {items.map(({ cert, effectiveStatus, qrDataUrl }) => (
               <CertificateDisplay
                 key={cert.id}
@@ -81,9 +75,8 @@ export default async function CertificatesPage({
             ))}
           </div>
         ) : (
-          <p className="mt-10 text-ink-muted">{t("noCertificates")}</p>
+          <p className="mt-6 text-sm text-ink-muted">{t("noCertificates")}</p>
         )}
-      </div>
     </div>
   );
 }
