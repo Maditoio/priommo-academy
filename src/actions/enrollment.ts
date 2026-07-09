@@ -3,7 +3,7 @@
 import { auth, requireAuth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { initiatePayment, enrollInFreeCourse, confirmPayment } from "@/lib/payments";
-import { issueCertificateOnExamPass, revokeCertificate } from "@/lib/certificates";
+import { revokeCertificate } from "@/lib/certificates";
 import { requireAdmin } from "@/lib/auth";
 import { adminRedirect } from "@/lib/admin-redirect";
 import { revalidatePath } from "next/cache";
@@ -44,27 +44,6 @@ export async function processMockPayment(paymentId: string, success: boolean, lo
     adminRedirect(`/${locale}/dashboard`, "Payment confirmed — you are enrolled!");
   }
   adminRedirect(`/${locale}/payment/${paymentId}?failed=1`, "Payment failed", "error");
-}
-
-export async function submitExam(examId: string, enrollmentId: string, locale: string) {
-  const session = await requireAuth();
-  const score = 85;
-  const result = await issueCertificateOnExamPass({
-    userId: session.user.id,
-    examId,
-    score,
-  });
-
-  revalidatePath(`/${locale}/dashboard`);
-  revalidatePath(`/${locale}/dashboard/enrollments/${enrollmentId}`);
-
-  if (result.certificate) {
-    adminRedirect(
-      `/${locale}/dashboard/enrollments/${enrollmentId}`,
-      "Exam passed — certificate issued!"
-    );
-  }
-  adminRedirect(`/${locale}/dashboard/enrollments/${enrollmentId}`, "Exam completed", "success");
 }
 
 export async function revokeCertificateAction(id: string, reason: string, locale: string) {

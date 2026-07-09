@@ -32,12 +32,18 @@ enum PaymentStatus {
   REFUNDED
 }
 
+enum ExamAttemptMode {
+  OFFICIAL
+  PRACTICE
+}
+
 model User {
   id             String            @id @default(cuid())
   email          String            @unique
   phone          String?
   passwordHash   String?
   name           String
+  imageUrl       String?
   role           Role              @default(LEARNER)
   locale         String            @default("fr")
   organizationId String?
@@ -60,6 +66,18 @@ model Organization {
   createdAt    DateTime @default(now())
 }
 
+model CertificationLevel {
+  id             String           @id @default(cuid())
+  slug           String           @unique
+  nameFr         String
+  nameEn         String
+  rank           Int              @default(0)
+  createdAt      DateTime         @default(now())
+  courses        Course[]
+  certifications Certification[]
+  examQuestions  ExamQuestion[]
+}
+
 model Course {
   id             String          @id @default(cuid())
   slug           String          @unique
@@ -67,13 +85,15 @@ model Course {
   titleEn        String
   descriptionFr  String
   descriptionEn  String
-  level          String
+  levelId        String
+  level          CertificationLevel @relation(fields: [levelId], references: [id])
   price          Decimal         @db.Decimal(10, 2)
   currency       String          @default("USD")
   imageUrl       String?
   published      Boolean         @default(false)
   modules        Module[]
   exams          Exam[]
+  examCategories ExamCategory[]
   enrollments    Enrollment[]
   certifications Certification[]
   createdAt      DateTime        @default(now())
@@ -118,25 +138,103 @@ model Enrollment {
   @@unique([userId, courseId])
 }
 
-model Exam {
-  id           String        @id @default(cuid())
+model ExamCategory {
+  id           String                    @id @default(cuid())
   courseId     String
-  course       Course        @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  titleFr      String
-  titleEn      String
-  passingScore Int           @default(70)
-  attempts     ExamAttempt[]
+  course       Course                    @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  nameFr       String
+  nameEn       String
+  slug         String
+  requirements ExamCategoryRequirement[]
+  questions    ExamQuestion[]
+
+  @@unique([courseId, slug])
+}
+
+model Exam {
+  id             String                    @id @default(cuid())
+  courseId       String
+  course         Course                    @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  titleFr        String
+  titleEn        String
+  passingScore   Int                       @default(70)
+  durationMin    Int                       @default(60)
+  maxAttempts    Int                       @default(3)
+  isPractice     Boolean                   @default(false)
+  questionCount  Int?
+  attempts       ExamAttempt[]
+  questions      ExamQuestion[]
+  categoryReqs   ExamCategoryRequirement[]
+}
+
+model ExamCategoryRequirement {
+  id         String       @id @default(cuid())
+  examId     String
+  exam       Exam         @relation(fields: [examId], references: [id], onDelete: Cascade)
+  categoryId String
+  category   ExamCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  minScore   Int
+
+  @@unique([examId, categoryId])
+}
+
+model ExamQuestion {
+  id         String             @id @default(cuid())
+  examId     String
+  exam       Exam               @relation(fields: [examId], references: [id], onDelete: Cascade)
+  levelId    String
+  level      CertificationLevel @relation(fields: [levelId], references: [id])
+  categoryId String
+  category   ExamCategory       @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  promptFr   String
+  promptEn   String
+  order      Int                @default(0)
+  active     Boolean            @default(true)
+  choices    ExamChoice[]
+  answers    ExamAttemptAnswer[]
+}
+
+model ExamChoice {
+  id         String              @id @default(cuid())
+  questionId String
+  question   ExamQuestion        @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  labelFr    String
+  labelEn    String
+  isCorrect  Boolean             @default(false)
+  order      Int                 @default(0)
+  answers    ExamAttemptAnswer[]
 }
 
 model ExamAttempt {
-  id          String   @id @default(cuid())
-  examId      String
-  exam        Exam     @relation(fields: [examId], references: [id])
-  userId      String
-  user        User     @relation(fields: [userId], references: [id])
-  score       Int
-  passed      Boolean
-  attemptedAt DateTime @default(now())
+  id             String              @id @default(cuid())
+  examId         String
+  exam           Exam                @relation(fields: [examId], references: [id])
+  userId         String
+  user           User                @relation(fields: [userId], references: [id])
+  mode           ExamAttemptMode     @default(OFFICIAL)
+  score          Int                 @default(0)
+  passed         Boolean             @default(false)
+  startedAt      DateTime            @default(now())
+  endsAt         DateTime
+  finishedAt     DateTime?
+  timedOut       Boolean             @default(false)
+  categoryScores Json?
+  questionIds    String[]
+  answers        ExamAttemptAnswer[]
+  attemptedAt    DateTime            @default(now())
+}
+
+model ExamAttemptAnswer {
+  id         String        @id @default(cuid())
+  attemptId  String
+  attempt    ExamAttempt   @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  questionId String
+  question   ExamQuestion  @relation(fields: [questionId], references: [id])
+  choiceId   String?
+  choice     ExamChoice?   @relation(fields: [choiceId], references: [id])
+  isCorrect  Boolean       @default(false)
+
+  @@unique([attemptId, questionId])
 }
 
 model Certification {
@@ -146,7 +244,8 @@ model Certification {
   titleEn         String
   descriptionFr   String
   descriptionEn   String
-  level           String
+  levelId         String
+  level           CertificationLevel  @relation(fields: [levelId], references: [id])
   rank            Int                 @default(0)
   validityMonths  Int                 @default(24)
   courseId        String?

@@ -1,25 +1,17 @@
 import { Link } from "@/i18n/routing";
 import { cn } from "@/lib/utils";
-import {
-  Award,
-  BookOpen,
-  Building2,
-  CreditCard,
-  GraduationCap,
-  LayoutDashboard,
-  Users,
-  UserCheck,
-} from "lucide-react";
+import { MaterialIcon } from "@/components/ui/material-icon";
 
 const navItems = [
-  { href: "/admin", labelKey: "overview", icon: LayoutDashboard },
-  { href: "/admin/courses", labelKey: "courses", icon: BookOpen },
-  { href: "/admin/certifications", labelKey: "certifications", icon: Award },
-  { href: "/admin/enrollments", labelKey: "enrollments", icon: UserCheck },
-  { href: "/admin/certificates", labelKey: "certificates", icon: GraduationCap },
-  { href: "/admin/users", labelKey: "users", icon: Users },
-  { href: "/admin/organizations", labelKey: "organizations", icon: Building2 },
-  { href: "/admin/payments", labelKey: "payments", icon: CreditCard },
+  { href: "/admin", labelKey: "overview", icon: "dashboard" },
+  { href: "/admin/levels", labelKey: "levels", icon: "signal_cellular_alt" },
+  { href: "/admin/courses", labelKey: "courses", icon: "menu_book" },
+  { href: "/admin/certifications", labelKey: "certifications", icon: "workspace_premium" },
+  { href: "/admin/enrollments", labelKey: "enrollments", icon: "how_to_reg" },
+  { href: "/admin/certificates", labelKey: "certificates", icon: "verified" },
+  { href: "/admin/users", labelKey: "users", icon: "group" },
+  { href: "/admin/organizations", labelKey: "organizations", icon: "apartment" },
+  { href: "/admin/payments", labelKey: "payments", icon: "payments" },
 ];
 
 interface AdminShellProps {
@@ -37,7 +29,6 @@ export function AdminShell({ children, labels, currentPath }: AdminShellProps) {
         </div>
         <nav className="space-y-0.5 p-3">
           {navItems.map((item) => {
-            const Icon = item.icon;
             const isActive =
               currentPath === item.href ||
               (item.href !== "/admin" && currentPath.startsWith(item.href));
@@ -52,7 +43,7 @@ export function AdminShell({ children, labels, currentPath }: AdminShellProps) {
                     : "text-ink-muted hover:bg-surface-hover hover:text-ink"
                 )}
               >
-                <Icon className="h-4 w-4 shrink-0" />
+                <MaterialIcon name={item.icon} size={20} />
                 {labels[item.labelKey]}
               </Link>
             );

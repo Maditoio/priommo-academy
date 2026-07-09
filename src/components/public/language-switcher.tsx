@@ -3,7 +3,7 @@
 import { usePathname, useRouter } from "@/i18n/routing";
 import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Globe } from "lucide-react";
+import { MaterialIcon } from "@/components/ui/material-icon";
 
 export function LanguageSwitcher() {
   const router = useRouter();
@@ -20,7 +20,7 @@ export function LanguageSwitcher() {
       className="gap-1.5 text-ink-muted"
       aria-label="Switch language"
     >
-      <Globe className="h-4 w-4" />
+      <MaterialIcon name="language" size={18} />
       {nextLocale.toUpperCase()}
     </Button>
   );

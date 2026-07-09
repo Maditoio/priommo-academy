@@ -63,7 +63,8 @@ export async function addModule(courseId: string, formData: FormData, locale: st
 
   await db.module.create({ data: { ...parsed.data, courseId } });
   revalidatePath(`/${locale}/admin/courses`);
-  adminRedirect(`/${locale}/admin/courses?modal=edit&id=${courseId}`, "Module added");
+  revalidatePath(`/${locale}/admin/courses/${courseId}`);
+  adminRedirect(`/${locale}/admin/courses/${courseId}`, "Module added");
 }
 
 export async function addLesson(moduleId: string, courseId: string, formData: FormData, locale: string) {
@@ -83,19 +84,6 @@ export async function addLesson(moduleId: string, courseId: string, formData: Fo
     },
   });
   revalidatePath(`/${locale}/admin/courses`);
-  adminRedirect(`/${locale}/admin/courses?modal=edit&id=${courseId}`, "Lesson added");
-}
-
-export async function addExam(courseId: string, formData: FormData, locale: string) {
-  await requireAdmin();
-  const raw = Object.fromEntries(formData.entries());
-  const titleFr = String(raw.titleFr ?? "");
-  const titleEn = String(raw.titleEn ?? "");
-  const passingScore = Number(raw.passingScore ?? 70);
-
-  await db.exam.create({
-    data: { courseId, titleFr, titleEn, passingScore },
-  });
-  revalidatePath(`/${locale}/admin/courses`);
-  adminRedirect(`/${locale}/admin/courses?modal=edit&id=${courseId}`, "Exam added");
+  revalidatePath(`/${locale}/admin/courses/${courseId}`);
+  adminRedirect(`/${locale}/admin/courses/${courseId}`, "Lesson added");
 }

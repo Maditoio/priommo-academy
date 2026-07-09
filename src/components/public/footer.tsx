@@ -1,5 +1,5 @@
 import { Link } from "@/i18n/routing";
-import { Award } from "lucide-react";
+import { MaterialIcon } from "@/components/ui/material-icon";
 
 interface FooterProps {
   labels: {
@@ -17,7 +17,7 @@ export function Footer({ labels }: FooterProps) {
       <div className="mx-auto flex max-w-7xl flex-col gap-8 px-6 py-12 lg:flex-row lg:justify-between lg:px-12">
         <div>
           <div className="flex items-center gap-2">
-            <Award className="h-5 w-5 text-accent" />
+            <MaterialIcon name="workspace_premium" className="text-accent" size={22} />
             <p className="font-semibold text-ink">{labels.appName}</p>
           </div>
           <p className="mt-2 max-w-sm text-sm text-ink-muted">{labels.tagline}</p>

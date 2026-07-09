@@ -6,18 +6,24 @@ import { Pagination } from "@/components/admin/pagination";
 import { CoursesAdmin } from "@/components/admin/courses-admin";
 import { StatusBadge } from "@/components/public/status-badge";
 import { Button } from "@/components/ui/button";
+import { MaterialIcon } from "@/components/ui/material-icon";
 import { Link } from "@/i18n/routing";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { formatPrice } from "@/lib/utils";
 import { Suspense } from "react";
-import { Plus } from "lucide-react";
 
 export default async function AdminCoursesPage({
   params,
   searchParams,
 }: {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ page?: string; pageSize?: string; search?: string; modal?: string; id?: string }>;
+  searchParams: Promise<{
+    page?: string;
+    pageSize?: string;
+    search?: string;
+    modal?: string;
+    id?: string;
+  }>;
 }) {
   const { locale } = await params;
   const sp = await searchParams;
@@ -26,6 +32,7 @@ export default async function AdminCoursesPage({
 
   const ta = await getTranslations("admin");
   const tc = await getTranslations("common");
+  const te = await getTranslations("exam");
   const page = Number(sp.page ?? 1);
   const pageSize = Number(sp.pageSize ?? 10);
 
@@ -39,27 +46,22 @@ export default async function AdminCoursesPage({
       }
     : {};
 
-  const [courses, total, editCourse] = await Promise.all([
+  const [courses, total, editCourse, levels] = await Promise.all([
     db.course.findMany({
       where,
       skip: (page - 1) * pageSize,
       take: pageSize,
       orderBy: { updatedAt: "desc" },
-      include: { _count: { select: { enrollments: true } } },
+      include: {
+        level: true,
+        _count: { select: { enrollments: true, modules: true } },
+      },
     }),
     db.course.count({ where }),
     sp.modal === "edit" && sp.id
-      ? db.course.findUnique({
-          where: { id: sp.id },
-          include: {
-            modules: {
-              orderBy: { order: "asc" },
-              include: { lessons: { orderBy: { order: "asc" } } },
-            },
-            exams: true,
-          },
-        })
+      ? db.course.findUnique({ where: { id: sp.id } })
       : Promise.resolve(null),
+    db.certificationLevel.findMany({ orderBy: { rank: "asc" } }),
   ]);
 
   const labels = {
@@ -72,9 +74,11 @@ export default async function AdminCoursesPage({
     users: ta("users"),
     organizations: ta("organizations"),
     payments: ta("payments"),
+    levels: te("levels"),
     createCourse: ta("createCourse"),
     edit: tc("edit"),
     save: tc("save"),
+    cancel: tc("cancel"),
     titleFr: ta("titleFr"),
     titleEn: ta("titleEn"),
     descriptionFr: ta("descriptionFr"),
@@ -85,9 +89,6 @@ export default async function AdminCoursesPage({
     currency: ta("currency"),
     imageUrl: ta("imageUrl"),
     publish: ta("publish"),
-    modules: ta("modules"),
-    addModule: ta("addModule"),
-    addLesson: ta("addLesson"),
   };
 
   return (
@@ -96,7 +97,7 @@ export default async function AdminCoursesPage({
         <h1 className="text-[1.875rem] font-semibold text-ink">{ta("courses")}</h1>
         <Button asChild>
           <Link href="/admin/courses?modal=create">
-            <Plus className="mr-2 h-4 w-4" />
+            <MaterialIcon name="add" size={18} />
             {ta("createCourse")}
           </Link>
         </Button>
@@ -107,7 +108,7 @@ export default async function AdminCoursesPage({
           columns={[
             { key: "title", header: ta("titleFr"), cell: (r) => r.titleFr },
             { key: "slug", header: ta("slug"), cell: (r) => r.slug },
-            { key: "level", header: ta("level"), cell: (r) => r.level },
+            { key: "level", header: ta("level"), cell: (r) => r.level.nameFr },
             {
               key: "price",
               header: ta("price"),
@@ -124,6 +125,11 @@ export default async function AdminCoursesPage({
               ),
             },
             {
+              key: "modules",
+              header: ta("modules"),
+              cell: (r) => r._count.modules,
+            },
+            {
               key: "enrollments",
               header: ta("enrollments"),
               cell: (r) => r._count.enrollments,
@@ -132,9 +138,20 @@ export default async function AdminCoursesPage({
               key: "actions",
               header: tc("actions"),
               cell: (r) => (
-                <Button asChild variant="ghost" size="sm">
-                  <Link href={`/admin/courses?modal=edit&id=${r.id}`}>{tc("edit")}</Link>
-                </Button>
+                <div className="flex items-center gap-1">
+                  <Button asChild variant="ghost" size="sm">
+                    <Link href={`/admin/courses/${r.id}`}>
+                      <MaterialIcon name="visibility" size={18} />
+                      {locale === "fr" ? "Voir" : "View"}
+                    </Link>
+                  </Button>
+                  <Button asChild variant="ghost" size="sm">
+                    <Link href={`/admin/courses?modal=edit&id=${r.id}`}>
+                      <MaterialIcon name="edit" size={18} />
+                      {tc("edit")}
+                    </Link>
+                  </Button>
+                </div>
               ),
             },
           ]}
@@ -153,7 +170,7 @@ export default async function AdminCoursesPage({
       </div>
 
       <Suspense>
-        <CoursesAdmin locale={locale} labels={labels} editCourse={editCourse} />
+        <CoursesAdmin locale={locale} labels={labels} levels={levels} editCourse={editCourse} />
       </Suspense>
     </AdminShell>
   );

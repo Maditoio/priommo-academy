@@ -6,38 +6,33 @@ import { BilingualFields } from "@/components/admin/bilingual-fields";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Separator } from "@/components/ui/separator";
-import { updateCourse, addModule, addLesson, addExam } from "@/actions/courses";
-import { createCourse } from "@/actions/courses";
+import { MaterialIcon } from "@/components/ui/material-icon";
+import { createCourse, updateCourse } from "@/actions/courses";
 
-type Lesson = { id: string; titleFr: string; titleEn: string; contentType: string };
-type Module = { id: string; titleFr: string; titleEn: string; lessons: Lesson[] };
-type Exam = { id: string; titleFr: string; titleEn: string; passingScore: number };
+type Level = { id: string; nameFr: string; nameEn: string };
 
-type CourseDetail = {
+type CourseBasic = {
   id: string;
   slug: string;
   titleFr: string;
   titleEn: string;
   descriptionFr: string;
   descriptionEn: string;
-  level: string;
+  levelId: string;
   price: { toString(): string };
   currency: string;
   imageUrl: string | null;
   published: boolean;
-  modules: Module[];
-  exams: Exam[];
 };
 
 interface CoursesAdminProps {
   locale: string;
   labels: Record<string, string>;
-  editCourse?: CourseDetail | null;
+  levels: Level[];
+  editCourse?: CourseBasic | null;
 }
 
-export function CoursesAdmin({ locale, labels, editCourse }: CoursesAdminProps) {
+export function CoursesAdmin({ locale, labels, levels, editCourse }: CoursesAdminProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const modal = searchParams.get("modal");
@@ -79,8 +74,20 @@ export function CoursesAdmin({ locale, labels, editCourse }: CoursesAdminProps) 
               <Input id="slug" name="slug" defaultValue={course?.slug} required />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="level">{labels.level}</Label>
-              <Input id="level" name="level" defaultValue={course?.level} required />
+              <Label htmlFor="levelId">{labels.level}</Label>
+              <select
+                id="levelId"
+                name="levelId"
+                defaultValue={course?.levelId}
+                required
+                className="flex h-10 w-full rounded-xl border border-border bg-surface px-3 text-sm"
+              >
+                {levels.map((l) => (
+                  <option key={l.id} value={l.id}>
+                    {l.nameFr}
+                  </option>
+                ))}
+              </select>
             </div>
             <div className="space-y-2">
               <Label htmlFor="price">{labels.price}</Label>
@@ -102,72 +109,20 @@ export function CoursesAdmin({ locale, labels, editCourse }: CoursesAdminProps) 
               <Input id="imageUrl" name="imageUrl" defaultValue={course?.imageUrl ?? ""} />
             </div>
           </div>
-          <label className="flex items-center gap-2 text-sm">
+          <label className="flex items-center gap-2 text-sm text-ink">
             <input type="checkbox" name="published" defaultChecked={course?.published} className="rounded" />
             {labels.publish}
           </label>
-          <Button type="submit">{labels.save}</Button>
+          <div className="flex gap-3 pt-2">
+            <Button type="submit">
+              <MaterialIcon name="save" size={18} />
+              {labels.save}
+            </Button>
+            <Button type="button" variant="secondary" onClick={closeSheet}>
+              {labels.cancel ?? "Cancel"}
+            </Button>
+          </div>
         </form>
-
-        {course && (
-          <>
-            <Separator className="my-8" />
-            <h3 className="text-base font-semibold text-ink">{labels.modules}</h3>
-            {course.modules.map((mod) => (
-              <div key={mod.id} className="mt-4 rounded-xl bg-bg p-4">
-                <p className="font-medium text-ink">
-                  {mod.titleFr} / {mod.titleEn}
-                </p>
-                <ul className="mt-2 space-y-1 text-sm text-ink-muted">
-                  {mod.lessons.map((l) => (
-                    <li key={l.id}>
-                      • {l.titleFr} ({l.contentType})
-                    </li>
-                  ))}
-                </ul>
-                <form
-                  action={async (fd) => addLesson(mod.id, course.id, fd, locale)}
-                  className="mt-4 grid gap-2 sm:grid-cols-2"
-                >
-                  <Input name="titleFr" placeholder={labels.titleFr} required />
-                  <Input name="titleEn" placeholder={labels.titleEn} required />
-                  <Input name="contentType" placeholder="video | pdf | text" defaultValue="text" required />
-                  <Input name="order" type="number" defaultValue={mod.lessons.length} required />
-                  <Input name="durationMin" type="number" placeholder="Duration (min)" className="sm:col-span-2" />
-                  <Textarea name="bodyFr" placeholder="Body FR" className="sm:col-span-2" />
-                  <Button type="submit" size="sm">
-                    {labels.addLesson}
-                  </Button>
-                </form>
-              </div>
-            ))}
-
-            <form action={async (fd) => addModule(course.id, fd, locale)} className="mt-4 flex flex-wrap gap-2">
-              <Input name="titleFr" placeholder={labels.titleFr} className="max-w-xs" required />
-              <Input name="titleEn" placeholder={labels.titleEn} className="max-w-xs" required />
-              <Input name="order" type="number" defaultValue={course.modules.length} className="w-20" required />
-              <Button type="submit" variant="secondary">
-                {labels.addModule}
-              </Button>
-            </form>
-
-            <Separator className="my-8" />
-            <h3 className="text-base font-semibold text-ink">Exam</h3>
-            {course.exams.map((exam) => (
-              <p key={exam.id} className="mt-2 text-sm text-ink-muted">
-                {exam.titleFr} — {exam.passingScore}%
-              </p>
-            ))}
-            <form action={async (fd) => addExam(course.id, fd, locale)} className="mt-4 flex flex-wrap gap-2">
-              <Input name="titleFr" placeholder={labels.titleFr} className="max-w-xs" required />
-              <Input name="titleEn" placeholder={labels.titleEn} className="max-w-xs" required />
-              <Input name="passingScore" type="number" defaultValue={70} className="w-24" />
-              <Button type="submit" variant="secondary">
-                Add exam
-              </Button>
-            </form>
-          </>
-        )}
       </SheetContent>
     </Sheet>
   );

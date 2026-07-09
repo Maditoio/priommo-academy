@@ -9,7 +9,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { MaterialIcon } from "@/components/ui/material-icon";
 
 interface PaginationProps {
   page: number;
@@ -61,7 +61,7 @@ export function Pagination({ page, pageSize, total, showingLabel, pageSizeLabel 
             disabled={page <= 1}
             onClick={() => updateParams({ page: String(page - 1) })}
           >
-            <ChevronLeft className="h-4 w-4" />
+            <MaterialIcon name="chevron_left" size={20} />
           </Button>
           <span className="min-w-[4rem] text-center text-sm">
             {page} / {totalPages}
@@ -72,7 +72,7 @@ export function Pagination({ page, pageSize, total, showingLabel, pageSizeLabel 
             disabled={page >= totalPages}
             onClick={() => updateParams({ page: String(page + 1) })}
           >
-            <ChevronRight className="h-4 w-4" />
+            <MaterialIcon name="chevron_right" size={20} />
           </Button>
         </div>
       </div>

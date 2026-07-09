@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { localizedField } from "@/lib/utils";
+import { levelName } from "@/lib/levels";
 import { generateCertificateQR } from "@/lib/qr";
 import { CertificateDisplay } from "@/components/public/certificate-display";
 import { Link } from "@/i18n/routing";
@@ -22,11 +23,17 @@ export default async function CertificatesPage({
   const ts = await getTranslations("status");
   const tv = await getTranslations("verify");
 
-  const certificates = await db.certificateIssued.findMany({
-    where: { userId: session.user.id },
-    include: { certification: true },
-    orderBy: { issuedAt: "desc" },
-  });
+  const [user, certificates] = await Promise.all([
+    db.user.findUniqueOrThrow({
+      where: { id: session.user.id },
+      select: { name: true, imageUrl: true },
+    }),
+    db.certificateIssued.findMany({
+      where: { userId: session.user.id },
+      include: { certification: { include: { level: true } } },
+      orderBy: { issuedAt: "desc" },
+    }),
+  ]);
 
   const items = await Promise.all(
     certificates.map(async (cert) => {
@@ -52,8 +59,10 @@ export default async function CertificatesPage({
                 key={cert.id}
                 uniqueCode={cert.uniqueCode}
                 status={cert.status}
-                level={cert.certification.level}
+                level={levelName(cert.certification.level, locale)}
                 title={localizedField(cert.certification, "title", locale)}
+                holderName={user.name}
+                holderImageUrl={user.imageUrl}
                 issuedAt={cert.issuedAt.toISOString()}
                 expiresAt={cert.expiresAt?.toISOString() ?? null}
                 qrDataUrl={qrDataUrl}
@@ -61,6 +70,7 @@ export default async function CertificatesPage({
                 statusLabel={ts(effectiveStatus)}
                 compact
                 labels={{
+                  holder: tv("holder"),
                   issuedAt: tv("issuedAt"),
                   expiresAt: tv("expiresAt"),
                   verify: t("viewCertificate"),

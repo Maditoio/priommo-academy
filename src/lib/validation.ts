@@ -12,6 +12,12 @@ export const registerSchema = z.object({
   phone: z.string().optional(),
 });
 
+export const profileSchema = z.object({
+  name: z.string().min(2),
+  phone: z.string().optional().or(z.literal("")),
+  imageUrl: z.string().url().optional().or(z.literal("")),
+});
+
 export const bilingualTextSchema = z.object({
   titleFr: z.string().min(1),
   titleEn: z.string().min(1),
@@ -21,7 +27,7 @@ export const bilingualTextSchema = z.object({
 
 export const courseSchema = bilingualTextSchema.extend({
   slug: z.string().min(1).regex(/^[a-z0-9-]+$/),
-  level: z.string().min(1),
+  levelId: z.string().min(1),
   price: z.coerce.number().min(0),
   currency: z.string().default("USD"),
   imageUrl: z.string().url().optional().or(z.literal("")),
@@ -45,9 +51,16 @@ export const lessonSchema = z.object({
   durationMin: z.coerce.number().int().min(0).optional(),
 });
 
+export const levelSchema = z.object({
+  slug: z.string().min(1).regex(/^[a-z0-9-]+$/),
+  nameFr: z.string().min(1),
+  nameEn: z.string().min(1),
+  rank: z.coerce.number().int().min(0).default(0),
+});
+
 export const certificationSchema = bilingualTextSchema.extend({
   slug: z.string().min(1).regex(/^[a-z0-9-]+$/),
-  level: z.string().min(1),
+  levelId: z.string().min(1),
   rank: z.coerce.number().int().min(0).default(0),
   validityMonths: z.coerce.number().int().min(1).max(120).default(24),
   courseId: z.string().optional().nullable(),
@@ -64,6 +77,29 @@ export const examSchema = z.object({
   titleFr: z.string().min(1),
   titleEn: z.string().min(1),
   passingScore: z.coerce.number().int().min(0).max(100).default(70),
+  durationMin: z.coerce.number().int().min(1).max(480).default(60),
+  maxAttempts: z.coerce.number().int().min(1).max(100).default(3),
+  isPractice: z.boolean().default(false),
+  questionCount: z.coerce.number().int().min(1).optional().nullable(),
+});
+
+export const examCategorySchema = z.object({
+  nameFr: z.string().min(1),
+  nameEn: z.string().min(1),
+  slug: z.string().min(1).regex(/^[a-z0-9-]+$/),
+});
+
+export const examCategoryReqSchema = z.object({
+  categoryId: z.string().min(1),
+  minScore: z.coerce.number().int().min(0).max(100),
+});
+
+export const examQuestionSchema = z.object({
+  levelId: z.string().min(1),
+  categoryId: z.string().min(1),
+  promptFr: z.string().min(1),
+  promptEn: z.string().min(1),
+  order: z.coerce.number().int().min(0).default(0),
 });
 
 export const paginationSchema = z.object({

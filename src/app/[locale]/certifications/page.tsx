@@ -26,7 +26,7 @@ export default async function CertificationsPage({
       skip: (page - 1) * pageSize,
       take: pageSize,
       orderBy: { rank: "asc" },
-      include: { course: { select: { slug: true, titleFr: true, titleEn: true } } },
+      include: { course: { select: { slug: true, titleFr: true, titleEn: true } }, level: true },
     }),
     db.certification.count(),
   ]);

@@ -22,6 +22,7 @@ export default async function AdminEnrollmentsPage({
   await requireAdmin();
 
   const ta = await getTranslations("admin");
+  const te = await getTranslations("exam");
   const ts = await getTranslations("status");
   const page = Number(sp.page ?? 1);
   const pageSize = Number(sp.pageSize ?? 10);
@@ -49,6 +50,7 @@ export default async function AdminEnrollmentsPage({
     users: ta("users"),
     organizations: ta("organizations"),
     payments: ta("payments"),
+    levels: te("levels"),
   };
 
   return (

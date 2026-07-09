@@ -46,6 +46,7 @@ export default async function LocaleLayout({
           logout: t("logout"),
           admin: t("admin"),
           verify: t("verify"),
+          profile: t("profile"),
           appName: tc("appName"),
         }}
       />

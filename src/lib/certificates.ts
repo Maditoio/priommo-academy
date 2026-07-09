@@ -8,45 +8,29 @@ function computeExpiresAt(validityMonths: number): Date {
   return d;
 }
 
-export async function issueCertificateOnExamPass(params: {
+export async function issueCertificateAfterPass(params: {
   userId: string;
   examId: string;
-  score: number;
+  courseId: string;
 }) {
   const exam = await db.exam.findUniqueOrThrow({
     where: { id: params.examId },
     include: {
       course: {
         include: {
-          certifications: { orderBy: { rank: "asc" } },
-          enrollments: { where: { userId: params.userId } },
+          certifications: { orderBy: { rank: "asc" }, include: { level: true } },
         },
       },
     },
   });
 
-  const passed = params.score >= exam.passingScore;
-
-  const attempt = await db.examAttempt.create({
-    data: {
-      examId: params.examId,
-      userId: params.userId,
-      score: params.score,
-      passed,
-    },
-  });
-
-  if (!passed) {
-    return { attempt, certificate: null, qrDataUrl: null };
-  }
-
   const certification = exam.course.certifications[0];
   if (!certification) {
     await db.enrollment.updateMany({
-      where: { userId: params.userId, courseId: exam.courseId },
+      where: { userId: params.userId, courseId: params.courseId },
       data: { status: "COMPLETED", completedAt: new Date(), progressPct: 100 },
     });
-    return { attempt, certificate: null, qrDataUrl: null };
+    return { certificate: null, qrDataUrl: null };
   }
 
   const existing = await db.certificateIssued.findFirst({
@@ -55,7 +39,11 @@ export async function issueCertificateOnExamPass(params: {
 
   if (existing) {
     const qrDataUrl = await generateCertificateQR(existing.uniqueCode);
-    return { attempt, certificate: existing, qrDataUrl };
+    await db.enrollment.updateMany({
+      where: { userId: params.userId, courseId: params.courseId },
+      data: { status: "COMPLETED", completedAt: new Date(), progressPct: 100 },
+    });
+    return { certificate: existing, qrDataUrl };
   }
 
   const uniqueCode = nanoid(10);
@@ -70,11 +58,11 @@ export async function issueCertificateOnExamPass(params: {
         status: "VALID",
         expiresAt,
       },
-      include: { certification: true, user: true },
+      include: { certification: { include: { level: true } }, user: true },
     });
 
     await tx.enrollment.updateMany({
-      where: { userId: params.userId, courseId: exam.courseId },
+      where: { userId: params.userId, courseId: params.courseId },
       data: { status: "COMPLETED", completedAt: new Date(), progressPct: 100 },
     });
 
@@ -82,7 +70,7 @@ export async function issueCertificateOnExamPass(params: {
   });
 
   const qrDataUrl = await generateCertificateQR(certificate.uniqueCode);
-  return { attempt, certificate, qrDataUrl };
+  return { certificate, qrDataUrl };
 }
 
 export async function revokeCertificate(id: string, reason: string) {

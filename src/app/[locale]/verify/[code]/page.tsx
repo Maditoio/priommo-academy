@@ -3,6 +3,7 @@ import { generateCertificateQR } from "@/lib/qr";
 import { CertificateDisplay } from "@/components/public/certificate-display";
 import { Card, CardContent } from "@/components/ui/card";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { levelName } from "@/lib/levels";
 import { VerificationSeal } from "@/components/public/verification-seal";
 
 export default async function VerifyPage({
@@ -17,7 +18,7 @@ export default async function VerifyPage({
 
   const certificate = await db.certificateIssued.findUnique({
     where: { uniqueCode: code },
-    include: { user: true, certification: true },
+    include: { user: true, certification: { include: { level: true } } },
   });
 
   if (!certificate) {
@@ -64,9 +65,10 @@ export default async function VerifyPage({
         <CertificateDisplay
           uniqueCode={certificate.uniqueCode}
           status={certificate.status}
-          level={certificate.certification.level}
+          level={levelName(certificate.certification.level, locale)}
           title={certTitle}
           holderName={certificate.user.name}
+          holderImageUrl={certificate.user.imageUrl}
           issuedAt={certificate.issuedAt.toISOString()}
           expiresAt={certificate.expiresAt?.toISOString() ?? null}
           qrDataUrl={qrDataUrl}

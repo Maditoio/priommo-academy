@@ -17,6 +17,7 @@ export default async function AdminEnrollmentDetailPage({
   await requireAdmin();
 
   const ta = await getTranslations("admin");
+  const te = await getTranslations("exam");
   const ts = await getTranslations("status");
 
   const enrollment = await db.enrollment.findUnique({
@@ -45,6 +46,7 @@ export default async function AdminEnrollmentDetailPage({
     users: ta("users"),
     organizations: ta("organizations"),
     payments: ta("payments"),
+    levels: te("levels"),
   };
 
   return (

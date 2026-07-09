@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { localizedField } from "@/lib/utils";
+import { levelName } from "@/lib/levels";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { VerificationSeal } from "@/components/public/verification-seal";
@@ -19,13 +20,14 @@ export default async function CertificationDetailPage({
 
   const certification = await db.certification.findUnique({
     where: { slug },
-    include: { course: true },
+    include: { course: true, level: true },
   });
 
   if (!certification) notFound();
 
   const title = localizedField(certification, "title", locale);
   const description = localizedField(certification, "description", locale);
+  const level = levelName(certification.level, locale);
 
   return (
     <div className="py-12 lg:py-16">
@@ -34,12 +36,12 @@ export default async function CertificationDetailPage({
           <VerificationSeal
             status="valid"
             code={certification.slug.slice(0, 10).toUpperCase()}
-            level={certification.level}
+            level={level}
             size="lg"
             className="mb-8"
           />
           <Badge variant="level" className="mb-4">
-            {certification.level}
+            {level}
           </Badge>
           <h1 className="font-display text-4xl font-semibold tracking-tight text-navy">{title}</h1>
           <p className="mt-4 text-lg text-ink-muted">{description}</p>

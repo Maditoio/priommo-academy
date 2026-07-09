@@ -6,7 +6,10 @@ import { BilingualFields } from "@/components/admin/bilingual-fields";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { MaterialIcon } from "@/components/ui/material-icon";
 import { createCertification, updateCertification } from "@/actions/certifications";
+
+type Level = { id: string; nameFr: string; nameEn: string };
 
 type Certification = {
   id: string;
@@ -15,7 +18,7 @@ type Certification = {
   titleEn: string;
   descriptionFr: string;
   descriptionEn: string;
-  level: string;
+  levelId: string;
   rank: number;
   validityMonths: number;
   courseId: string | null;
@@ -23,7 +26,7 @@ type Certification = {
 
 interface CertificationsAdminProps {
   locale: string;
-  certifications: Certification[];
+  levels: Level[];
   courses: { id: string; titleFr: string }[];
   labels: Record<string, string>;
   editCert?: Certification | null;
@@ -31,7 +34,7 @@ interface CertificationsAdminProps {
 
 export function CertificationsAdmin({
   locale,
-  certifications,
+  levels,
   courses,
   labels,
   editCert,
@@ -78,15 +81,27 @@ export function CertificationsAdmin({
               <Input id="slug" name="slug" defaultValue={cert?.slug} required />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="level">{labels.level}</Label>
-              <Input id="level" name="level" defaultValue={cert?.level} required placeholder="Débutant" />
+              <Label htmlFor="levelId">{labels.level}</Label>
+              <select
+                id="levelId"
+                name="levelId"
+                defaultValue={cert?.levelId}
+                required
+                className="flex h-10 w-full rounded-xl border border-border bg-surface px-3 text-sm"
+              >
+                {levels.map((l) => (
+                  <option key={l.id} value={l.id}>
+                    {l.nameFr}
+                  </option>
+                ))}
+              </select>
             </div>
             <div className="space-y-2">
               <Label htmlFor="rank">{labels.rank ?? "Rank"}</Label>
               <Input id="rank" name="rank" type="number" min={0} defaultValue={cert?.rank ?? 0} required />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="validityMonths">{labels.validityMonths ?? "Validity (months)"}</Label>
+              <Label htmlFor="validityMonths">{labels.validityMonths}</Label>
               <Input
                 id="validityMonths"
                 name="validityMonths"
@@ -114,7 +129,10 @@ export function CertificationsAdmin({
             </div>
           </div>
           <div className="flex gap-3 pt-4">
-            <Button type="submit">{labels.save ?? "Save"}</Button>
+            <Button type="submit">
+              <MaterialIcon name="save" size={18} />
+              {labels.save ?? "Save"}
+            </Button>
             <Button type="button" variant="secondary" onClick={closeSheet}>
               {labels.cancel ?? "Cancel"}
             </Button>

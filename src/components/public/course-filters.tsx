@@ -12,11 +12,13 @@ import {
 } from "@/components/ui/select";
 import { useState } from "react";
 
-const LEVELS = ["Débutant", "Professionnel", "Spécialisé", "Exécutif"];
+type LevelOption = { slug: string; nameFr: string; nameEn: string };
 
 interface CourseFiltersProps {
   searchPlaceholder: string;
   allLevelsLabel: string;
+  levels: LevelOption[];
+  locale: string;
   defaultSearch?: string;
   defaultLevel?: string;
 }
@@ -24,6 +26,8 @@ interface CourseFiltersProps {
 export function CourseFilters({
   searchPlaceholder,
   allLevelsLabel,
+  levels,
+  locale,
   defaultSearch,
   defaultLevel,
 }: CourseFiltersProps) {
@@ -58,9 +62,9 @@ export function CourseFilters({
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">{allLevelsLabel}</SelectItem>
-          {LEVELS.map((l) => (
-            <SelectItem key={l} value={l}>
-              {l}
+          {levels.map((l) => (
+            <SelectItem key={l.slug} value={l.slug}>
+              {locale === "fr" ? l.nameFr : l.nameEn}
             </SelectItem>
           ))}
         </SelectContent>

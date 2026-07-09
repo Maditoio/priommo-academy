@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound, redirect } from "next/navigation";
-import { CreditCard } from "lucide-react";
+import { MaterialIcon } from "@/components/ui/material-icon";
 
 export default async function PaymentPage({
   params,
@@ -39,13 +39,13 @@ export default async function PaymentPage({
     <div className="flex min-h-[60vh] items-center justify-center px-6 py-12">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CreditCard className="mx-auto h-10 w-10 text-primary" />
+          <MaterialIcon name="credit_card" className="mx-auto text-accent" size={40} />
           <CardTitle className="mt-4">{t("mockTitle")}</CardTitle>
           <CardDescription>{t("mockDescription")}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="rounded-lg bg-muted p-4 text-center">
-            <p className="font-display text-3xl font-semibold tracking-tight text-navy">
+            <p className="text-3xl font-semibold text-ink">
               {formatPrice(payment.amount.toString(), payment.currency, locale)}
             </p>
             {course && (

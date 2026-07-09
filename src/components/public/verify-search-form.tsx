@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
-import { Search } from "lucide-react";
+import { MaterialIcon } from "@/components/ui/material-icon";
 
 export function VerifySearchForm({
   labels,
@@ -28,7 +28,7 @@ export function VerifySearchForm({
       <Card className="w-full max-w-lg p-8 shadow-md">
         <div className="text-center">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-accent-soft">
-            <Search className="h-6 w-6 text-accent" />
+            <MaterialIcon name="search" className="text-accent" size={24} />
           </div>
           <h1 className="mt-6 text-[1.875rem] font-semibold text-ink">{labels.title}</h1>
           <p className="mt-2 text-sm text-ink-muted">{labels.subtitle}</p>
@@ -46,6 +46,7 @@ export function VerifySearchForm({
             />
           </div>
           <Button type="submit" className="w-full">
+            <MaterialIcon name="verified" size={18} />
             {labels.submit}
           </Button>
         </form>

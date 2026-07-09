@@ -2,6 +2,7 @@ import { db } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { enrollInCourse } from "@/actions/enrollment";
 import { localizedField, formatPrice } from "@/lib/utils";
+import { levelName } from "@/lib/levels";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,7 +11,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import { VerificationSeal } from "@/components/public/verification-seal";
-import { BookOpen, Clock } from "lucide-react";
+import { MaterialIcon } from "@/components/ui/material-icon";
 
 export default async function CourseDetailPage({
   params,
@@ -27,12 +28,13 @@ export default async function CourseDetailPage({
   const course = await db.course.findFirst({
     where: { slug, published: true },
     include: {
+      level: true,
       modules: {
         orderBy: { order: "asc" },
         include: { lessons: { orderBy: { order: "asc" } } },
       },
       exams: true,
-      certifications: { take: 1 },
+      certifications: { take: 1, include: { level: true } },
     },
   });
 
@@ -58,26 +60,26 @@ export default async function CourseDetailPage({
       <div className="mx-auto max-w-7xl px-6 lg:px-12">
         <div className="grid gap-8 lg:grid-cols-3">
           <div className="lg:col-span-2">
-            <div className="relative mb-6 aspect-[21/9] overflow-hidden rounded-[12px] border border-navy/10 bg-navy/5">
+            <div className="relative mb-6 aspect-[21/9] overflow-hidden rounded-xl bg-surface-hover">
               {course.imageUrl ? (
                 <Image src={course.imageUrl} alt={title} fill className="object-cover" />
               ) : (
                 <div className="flex h-full items-center justify-center">
-                  <BookOpen className="h-16 w-16 text-navy/20" />
+                  <MaterialIcon name="menu_book" className="text-ink-muted/30" size={64} />
                 </div>
               )}
             </div>
             <Badge variant="level" className="mb-4">
-              {course.level}
+              {levelName(course.level, locale)}
             </Badge>
-            <h1 className="font-display text-3xl font-semibold tracking-tight text-navy lg:text-4xl">
+            <h1 className="text-3xl font-semibold text-ink lg:text-4xl">
               {title}
             </h1>
             <p className="mt-4 text-lg text-ink-muted">{description}</p>
 
             <Separator className="my-8" />
 
-            <h2 className="font-display text-xl font-semibold text-navy">{t("curriculum")}</h2>
+            <h2 className="text-xl font-semibold text-ink">{t("curriculum")}</h2>
             <div className="mt-4 space-y-4">
               {course.modules.map((mod) => (
                 <Card key={mod.id}>
@@ -90,11 +92,11 @@ export default async function CourseDetailPage({
                     <ul className="space-y-2">
                       {mod.lessons.map((lesson) => (
                         <li key={lesson.id} className="flex items-center gap-2 text-sm text-ink-muted">
-                          <BookOpen className="h-4 w-4 shrink-0" />
+                          <MaterialIcon name="menu_book" size={16} />
                           {localizedField(lesson, "title", locale)}
                           {lesson.durationMin && (
                             <span className="ml-auto flex items-center gap-1">
-                              <Clock className="h-3 w-3" />
+                              <MaterialIcon name="schedule" size={14} />
                               {lesson.durationMin} min
                             </span>
                           )}
@@ -111,16 +113,16 @@ export default async function CourseDetailPage({
             <Card className="sticky top-24">
               <CardContent className="p-6">
                 {course.certifications[0] && (
-                  <div className="mb-6 flex justify-center border-b border-navy/10 pb-6">
+                  <div className="mb-6 flex justify-center border-b border-border pb-6">
                     <VerificationSeal
                       status="valid"
                       code="PREVIEW"
-                      level={course.certifications[0].level}
+                      level={levelName(course.certifications[0].level, locale)}
                       size="sm"
                     />
                   </div>
                 )}
-                <p className="font-display text-3xl font-semibold text-navy">
+                <p className="text-3xl font-semibold text-ink">
                   {isFree ? tcommon("free") : formatPrice(price, course.currency, locale)}
                 </p>
                 <p className="mt-2 text-sm text-ink-muted">

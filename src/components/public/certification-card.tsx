@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { localizedField } from "@/lib/utils";
+import { levelName } from "@/lib/levels";
 import { VerificationSeal } from "@/components/public/verification-seal";
 
 interface CertificationCardProps {
@@ -12,7 +13,7 @@ interface CertificationCardProps {
     titleEn: string;
     descriptionFr: string;
     descriptionEn: string;
-    level: string;
+    level: { nameFr: string; nameEn: string };
     rank?: number;
     course?: { slug: string; titleFr: string; titleEn: string } | null;
   };
@@ -24,6 +25,7 @@ interface CertificationCardProps {
 export function CertificationCard({ certification, locale, viewLabel }: CertificationCardProps) {
   const title = localizedField(certification, "title", locale);
   const description = localizedField(certification, "description", locale);
+  const level = levelName(certification.level, locale);
 
   return (
     <Card className="card-surface flex flex-col">
@@ -31,11 +33,11 @@ export function CertificationCard({ certification, locale, viewLabel }: Certific
         <VerificationSeal
           status="valid"
           code={certification.slug.slice(0, 10).toUpperCase()}
-          level={certification.level}
+          level={level}
           size="sm"
         />
         <Badge variant="level" className="mt-2">
-          {certification.level}
+          {level}
         </Badge>
         <CardTitle className="mt-3 text-lg">{title}</CardTitle>
       </CardHeader>

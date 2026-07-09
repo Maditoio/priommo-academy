@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/routing";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Suspense } from "react";
-import { Plus } from "lucide-react";
+import { MaterialIcon } from "@/components/ui/material-icon";
 
 export default async function AdminCertificationsPage({
   params,
@@ -28,15 +28,22 @@ export default async function AdminCertificationsPage({
   const page = Number(sp.page ?? 1);
   const pageSize = Number(sp.pageSize ?? 10);
 
-  const [certs, total, courses, editCert] = await Promise.all([
+  const te = await getTranslations("exam");
+
+  const [certs, total, courses, levels, editCert] = await Promise.all([
     db.certification.findMany({
       skip: (page - 1) * pageSize,
       take: pageSize,
       orderBy: { rank: "asc" },
-      include: { course: { select: { titleFr: true } }, _count: { select: { issued: true } } },
+      include: {
+        level: true,
+        course: { select: { titleFr: true } },
+        _count: { select: { issued: true } },
+      },
     }),
     db.certification.count(),
     db.course.findMany({ orderBy: { titleFr: "asc" }, select: { id: true, titleFr: true } }),
+    db.certificationLevel.findMany({ orderBy: { rank: "asc" } }),
     sp.modal === "edit" && sp.id
       ? db.certification.findUnique({ where: { id: sp.id } })
       : Promise.resolve(null),
@@ -52,6 +59,7 @@ export default async function AdminCertificationsPage({
     users: ta("users"),
     organizations: ta("organizations"),
     payments: ta("payments"),
+    levels: te("levels"),
     createCertification: ta("createCertification"),
     edit: tc("edit"),
     save: tc("save"),
@@ -73,7 +81,7 @@ export default async function AdminCertificationsPage({
         <h1 className="text-[1.875rem] font-semibold text-ink">{ta("certifications")}</h1>
         <Button asChild>
           <Link href="/admin/certifications?modal=create">
-            <Plus className="mr-2 h-4 w-4" />
+            <MaterialIcon name="add" size={18} />
             {ta("createCertification")}
           </Link>
         </Button>
@@ -86,7 +94,7 @@ export default async function AdminCertificationsPage({
             {
               key: "level",
               header: ta("level"),
-              cell: (r) => <Badge variant="level">{r.level}</Badge>,
+              cell: (r) => <Badge variant="level">{r.level.nameFr}</Badge>,
             },
             { key: "course", header: ta("linkedCourse"), cell: (r) => r.course?.titleFr ?? "—" },
             { key: "issued", header: ta("certificates"), cell: (r) => r._count.issued },
@@ -110,7 +118,7 @@ export default async function AdminCertificationsPage({
       <Suspense>
         <CertificationsAdmin
           locale={locale}
-          certifications={certs}
+          levels={levels}
           courses={courses}
           labels={labels}
           editCert={editCert}

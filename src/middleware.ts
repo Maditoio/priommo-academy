@@ -7,7 +7,7 @@ import { routing } from "@/i18n/routing";
 const intlMiddleware = createMiddleware(routing);
 
 const adminPaths = ["/admin"];
-const learnerPaths = ["/dashboard"];
+const learnerPaths = ["/dashboard", "/profile"];
 const orgPaths = ["/org"];
 
 type TokenRole = "LEARNER" | "ADMIN" | "ORG_ADMIN";

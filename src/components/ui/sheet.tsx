@@ -1,7 +1,7 @@
 "use client";
 
 import * as SheetPrimitive from "@radix-ui/react-dialog";
-import { X } from "lucide-react";
+import { MaterialIcon } from "@/components/ui/material-icon";
 import * as React from "react";
 import { cn } from "@/lib/utils";
 
@@ -41,7 +41,7 @@ const SheetContent = React.forwardRef<
     >
       {children}
       <SheetPrimitive.Close className="absolute right-4 top-4 rounded-lg p-1 text-ink-muted opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-accent">
-        <X className="h-4 w-4" />
+        <MaterialIcon name="close" size={20} />
         <span className="sr-only">Close</span>
       </SheetPrimitive.Close>
     </SheetPrimitive.Content>

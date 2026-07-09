@@ -8,13 +8,13 @@ import { Suspense } from "react";
 async function CourseList({
   locale,
   search,
-  level,
+  levelSlug,
   page,
   pageSize,
 }: {
   locale: string;
   search?: string;
-  level?: string;
+  levelSlug?: string;
   page: number;
   pageSize: number;
 }) {
@@ -22,9 +22,14 @@ async function CourseList({
   const tcommon = await getTranslations("common");
   const ta = await getTranslations("admin");
 
+  const levelRecord =
+    levelSlug && levelSlug !== "all"
+      ? await db.certificationLevel.findUnique({ where: { slug: levelSlug } })
+      : null;
+
   const where = {
     published: true,
-    ...(level && level !== "all" ? { level } : {}),
+    ...(levelRecord ? { levelId: levelRecord.id } : {}),
     ...(search
       ? {
           OR: [
@@ -41,7 +46,7 @@ async function CourseList({
       skip: (page - 1) * pageSize,
       take: pageSize,
       orderBy: { createdAt: "desc" },
-      include: { _count: { select: { modules: true } } },
+      include: { level: true, _count: { select: { modules: true } } },
     }),
     db.course.count({ where }),
   ]);
@@ -62,7 +67,7 @@ async function CourseList({
           ))}
         </div>
       ) : (
-        <p className="py-12 text-center text-muted-foreground">{t("noCourses")}</p>
+        <p className="py-12 text-center text-ink-muted">{t("noCourses")}</p>
       )}
       <div className="mt-8">
         <Pagination
@@ -91,12 +96,13 @@ export default async function CoursesPage({
   const t = await getTranslations("courses");
   const page = Number(sp.page ?? 1);
   const pageSize = Number(sp.pageSize ?? 9);
+  const levels = await db.certificationLevel.findMany({ orderBy: { rank: "asc" } });
 
   return (
     <div className="py-12 lg:py-16">
       <div className="mx-auto max-w-7xl px-6 lg:px-12">
         <div className="mb-8">
-          <h1 className="font-display text-4xl font-semibold tracking-tight text-navy">{t("title")}</h1>
+          <h1 className="text-[1.875rem] font-semibold text-ink sm:text-4xl">{t("title")}</h1>
           <p className="mt-2 text-ink-muted">{t("subtitle")}</p>
         </div>
 
@@ -104,16 +110,18 @@ export default async function CoursesPage({
           <CourseFilters
             searchPlaceholder={t("searchPlaceholder")}
             allLevelsLabel={t("allLevels")}
+            levels={levels}
+            locale={locale}
             defaultSearch={sp.search}
             defaultLevel={sp.level}
           />
         </Suspense>
 
-        <Suspense fallback={<p className="text-muted-foreground">Loading...</p>}>
+        <Suspense fallback={<p className="text-ink-muted">Loading...</p>}>
           <CourseList
             locale={locale}
             search={sp.search}
-            level={sp.level}
+            levelSlug={sp.level}
             page={page}
             pageSize={pageSize}
           />

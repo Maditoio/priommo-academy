@@ -3,7 +3,8 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { formatPrice, localizedField } from "@/lib/utils";
-import { BookOpen } from "lucide-react";
+import { levelName } from "@/lib/levels";
+import { MaterialIcon } from "@/components/ui/material-icon";
 import Image from "next/image";
 
 interface CourseCardProps {
@@ -13,7 +14,7 @@ interface CourseCardProps {
     titleEn: string;
     descriptionFr: string;
     descriptionEn: string;
-    level: string;
+    level: { nameFr: string; nameEn: string };
     price: { toString(): string } | number;
     currency: string;
     imageUrl?: string | null;
@@ -38,11 +39,11 @@ export function CourseCard({ course, locale, enrollLabel, freeLabel }: CourseCar
           <Image src={course.imageUrl} alt={title} fill className="object-cover" />
         ) : (
           <div className="flex h-full items-center justify-center">
-            <BookOpen className="h-12 w-12 text-ink-muted/30" />
+            <MaterialIcon name="menu_book" className="text-ink-muted/30" size={48} />
           </div>
         )}
         <Badge variant="level" className="absolute left-3 top-3">
-          {course.level}
+          {levelName(course.level, locale)}
         </Badge>
       </div>
       <CardHeader className="pb-2">
