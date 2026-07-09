@@ -6,6 +6,7 @@ import { VerificationSeal, sealStatusFromCertificate } from "@/components/public
 import { StatusBadge } from "@/components/public/status-badge";
 import { Button } from "@/components/ui/button";
 import { MaterialIcon } from "@/components/ui/material-icon";
+import { UserAvatar } from "@/components/ui/user-avatar";
 import { getVerifyUrl } from "@/lib/qr";
 import { format } from "date-fns";
 import { fr, enUS } from "date-fns/locale";
@@ -76,19 +77,7 @@ export function CertificateDisplay({
 
       {holderName && (
         <div className="mt-6 flex flex-col items-center gap-3 border-t border-border pt-6">
-          <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-accent-soft">
-            {holderImageUrl ? (
-              <Image
-                src={holderImageUrl}
-                alt={holderName}
-                width={64}
-                height={64}
-                className="h-full w-full object-cover"
-              />
-            ) : (
-              <MaterialIcon name="person" className="text-accent" size={28} />
-            )}
-          </div>
+          <UserAvatar src={holderImageUrl} name={holderName} size={64} />
           <div className="text-center">
             {labels.holder && <p className="text-xs text-ink-muted">{labels.holder}</p>}
             <p className="text-base font-semibold text-ink">{holderName}</p>

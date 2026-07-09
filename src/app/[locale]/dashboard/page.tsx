@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { auth } from "@/lib/auth";
+import { auth, signOut } from "@/lib/auth";
 import { Link } from "@/i18n/routing";
 import { StatusBadge } from "@/components/public/status-badge";
 import { VerificationSeal, sealStatusFromCertificate } from "@/components/public/verification-seal";
@@ -13,7 +13,7 @@ import { localizedField } from "@/lib/utils";
 import { levelName } from "@/lib/levels";
 import { format } from "date-fns";
 import { fr, enUS } from "date-fns/locale";
-import Image from "next/image";
+import { UserAvatar } from "@/components/ui/user-avatar";
 
 export default async function DashboardPage({
   params,
@@ -50,30 +50,31 @@ export default async function DashboardPage({
   return (
     <div className="py-12 lg:py-16">
       <div className="mx-auto max-w-7xl px-6 lg:px-12">
-        <div className="flex items-center gap-4">
-          <div className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-full bg-accent-soft">
-            {user.imageUrl ? (
-              <Image
-                src={user.imageUrl}
-                alt={user.name}
-                width={56}
-                height={56}
-                className="h-full w-full object-cover"
-              />
-            ) : (
-              <MaterialIcon name="person" className="text-accent" size={28} />
-            )}
-          </div>
+        <div className="flex flex-wrap items-center gap-4">
+          <UserAvatar src={user.imageUrl} name={user.name} size={56} />
           <div>
             <h1 className="text-[1.875rem] font-semibold text-ink">{t("title")}</h1>
             <p className="text-ink-muted">{user.name}</p>
           </div>
-          <Button asChild variant="secondary" size="sm" className="ml-auto">
-            <Link href="/profile">
-              <MaterialIcon name="manage_accounts" size={18} />
-              {locale === "fr" ? "Profil" : "Profile"}
-            </Link>
-          </Button>
+          <div className="ml-auto flex flex-wrap gap-2">
+            <Button asChild variant="secondary" size="sm">
+              <Link href="/profile">
+                <MaterialIcon name="manage_accounts" size={18} />
+                {locale === "fr" ? "Profil" : "Profile"}
+              </Link>
+            </Button>
+            <form
+              action={async () => {
+                "use server";
+                await signOut({ redirectTo: `/${locale}` });
+              }}
+            >
+              <Button type="submit" variant="ghost" size="sm">
+                <MaterialIcon name="logout" size={18} />
+                {locale === "fr" ? "Déconnexion" : "Log out"}
+              </Button>
+            </form>
+          </div>
         </div>
 
         <section className="mt-12">

@@ -4,8 +4,9 @@ import bcrypt from "bcryptjs";
 import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { registerSchema, profileSchema } from "@/lib/validation";
-import { adminRedirect } from "@/lib/admin-redirect";
+import { processAvatarUpload } from "@/lib/avatar";
 import { revalidatePath } from "next/cache";
+import { adminRedirect } from "@/lib/admin-redirect";
 
 export async function registerUser(formData: FormData) {
   const raw = {
@@ -41,11 +42,28 @@ export async function updateProfile(formData: FormData, locale: string) {
   const parsed = profileSchema.safeParse({
     name: formData.get("name"),
     phone: formData.get("phone") || "",
-    imageUrl: formData.get("imageUrl") || "",
   });
 
   if (!parsed.success) {
     adminRedirect(`/${locale}/profile`, "Invalid profile data", "error");
+  }
+
+  const removePhoto = formData.get("removePhoto") === "true";
+  const photoFile = formData.get("photo");
+
+  let imageUrl: string | null | undefined;
+  try {
+    if (removePhoto) {
+      imageUrl = null;
+    } else if (photoFile instanceof File) {
+      imageUrl = await processAvatarUpload(photoFile);
+    }
+  } catch (err) {
+    const code = err instanceof Error ? err.message : "";
+    if (code === "FILE_TOO_LARGE") {
+      adminRedirect(`/${locale}/profile`, "Image must be under 2 MB", "error");
+    }
+    adminRedirect(`/${locale}/profile`, "Please upload a JPG, PNG, or WebP image", "error");
   }
 
   await db.user.update({
@@ -53,7 +71,7 @@ export async function updateProfile(formData: FormData, locale: string) {
     data: {
       name: parsed.data!.name,
       phone: parsed.data!.phone || null,
-      imageUrl: parsed.data!.imageUrl || null,
+      ...(imageUrl !== undefined ? { imageUrl } : {}),
     },
   });
 

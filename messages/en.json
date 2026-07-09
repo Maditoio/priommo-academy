@@ -38,9 +38,13 @@
   "profile": {
     "title": "My profile",
     "subtitle": "Your name and photo appear on issued certificates.",
-    "imageUrl": "Profile picture URL",
-    "imageHint": "Paste a public image URL (JPG, PNG, or WebP).",
-    "certificateNote": "This name will appear on your certificates."
+    "photo": "Profile photo",
+    "uploadPhoto": "Upload photo",
+    "changePhoto": "Change photo",
+    "removePhoto": "Remove photo",
+    "photoHint": "JPG, PNG or WebP — max 2 MB. Shown on your certificates.",
+    "certificateNote": "This name will appear on your certificates.",
+    "accountSection": "Account details"
   },
   "home": {
     "heroTitle": "Train. Certify. Advance.",

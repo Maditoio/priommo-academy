@@ -15,7 +15,6 @@ export const registerSchema = z.object({
 export const profileSchema = z.object({
   name: z.string().min(2),
   phone: z.string().optional().or(z.literal("")),
-  imageUrl: z.string().url().optional().or(z.literal("")),
 });
 
 export const bilingualTextSchema = z.object({

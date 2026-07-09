@@ -25,7 +25,7 @@ export default async function ProfilePage({
   });
 
   return (
-    <div className="px-6 py-12 lg:py-16">
+    <div className="px-4 py-12 sm:px-6 lg:py-16">
       <ProfileForm
         locale={locale}
         user={user}
@@ -35,10 +35,14 @@ export default async function ProfilePage({
           name: ta("name"),
           email: ta("email"),
           phone: ta("phone"),
-          imageUrl: t("imageUrl"),
-          imageHint: t("imageHint"),
+          photo: t("photo"),
+          uploadPhoto: t("uploadPhoto"),
+          changePhoto: t("changePhoto"),
+          removePhoto: t("removePhoto"),
+          photoHint: t("photoHint"),
           save: tc("save"),
           certificateNote: t("certificateNote"),
+          accountSection: t("accountSection"),
         }}
       />
     </div>

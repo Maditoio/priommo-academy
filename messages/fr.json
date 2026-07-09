@@ -38,9 +38,13 @@
   "profile": {
     "title": "Mon profil",
     "subtitle": "Votre nom et photo apparaissent sur les certificats délivrés.",
-    "imageUrl": "URL de la photo de profil",
-    "imageHint": "Collez une URL d'image publique (JPG, PNG ou WebP).",
-    "certificateNote": "Ce nom apparaîtra sur vos certificats."
+    "photo": "Photo de profil",
+    "uploadPhoto": "Téléverser une photo",
+    "changePhoto": "Changer la photo",
+    "removePhoto": "Supprimer la photo",
+    "photoHint": "JPG, PNG ou WebP — max 2 Mo. Affichée sur vos certificats.",
+    "certificateNote": "Ce nom apparaîtra sur vos certificats.",
+    "accountSection": "Informations du compte"
   },
   "home": {
     "heroTitle": "Formez-vous. Certifiez-vous. Progressez.",
