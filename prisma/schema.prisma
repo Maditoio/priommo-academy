@@ -1,0 +1,181 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  LEARNER
+  ADMIN
+  ORG_ADMIN
+}
+
+enum EnrollmentStatus {
+  ACTIVE
+  COMPLETED
+  DROPPED
+}
+
+enum CertificateStatus {
+  VALID
+  REVOKED
+  EXPIRED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+model User {
+  id             String            @id @default(cuid())
+  email          String            @unique
+  phone          String?
+  passwordHash   String?
+  name           String
+  role           Role              @default(LEARNER)
+  locale         String            @default("fr")
+  organizationId String?
+  organization   Organization?     @relation(fields: [organizationId], references: [id])
+  enrollments    Enrollment[]
+  certificates   CertificateIssued[]
+  examAttempts   ExamAttempt[]
+  payments       Payment[]
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+}
+
+model Organization {
+  id           String   @id @default(cuid())
+  name         String
+  type         String
+  contactEmail String
+  seats        Int      @default(0)
+  members      User[]
+  createdAt    DateTime @default(now())
+}
+
+model Course {
+  id             String          @id @default(cuid())
+  slug           String          @unique
+  titleFr        String
+  titleEn        String
+  descriptionFr  String
+  descriptionEn  String
+  level          String
+  price          Decimal         @db.Decimal(10, 2)
+  currency       String          @default("USD")
+  imageUrl       String?
+  published      Boolean         @default(false)
+  modules        Module[]
+  exams          Exam[]
+  enrollments    Enrollment[]
+  certifications Certification[]
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+}
+
+model Module {
+  id       String   @id @default(cuid())
+  courseId String
+  course   Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  titleFr  String
+  titleEn  String
+  order    Int
+  lessons  Lesson[]
+}
+
+model Lesson {
+  id          String  @id @default(cuid())
+  moduleId    String
+  module      Module  @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  titleFr     String
+  titleEn     String
+  contentType String
+  contentUrl  String?
+  bodyFr      String?
+  bodyEn      String?
+  order       Int
+  durationMin Int?
+}
+
+model Enrollment {
+  id          String           @id @default(cuid())
+  userId      String
+  user        User             @relation(fields: [userId], references: [id])
+  courseId    String
+  course      Course           @relation(fields: [courseId], references: [id])
+  status      EnrollmentStatus @default(ACTIVE)
+  progressPct Int              @default(0)
+  enrolledAt  DateTime         @default(now())
+  completedAt DateTime?
+
+  @@unique([userId, courseId])
+}
+
+model Exam {
+  id           String        @id @default(cuid())
+  courseId     String
+  course       Course        @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  titleFr      String
+  titleEn      String
+  passingScore Int           @default(70)
+  attempts     ExamAttempt[]
+}
+
+model ExamAttempt {
+  id          String   @id @default(cuid())
+  examId      String
+  exam        Exam     @relation(fields: [examId], references: [id])
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  score       Int
+  passed      Boolean
+  attemptedAt DateTime @default(now())
+}
+
+model Certification {
+  id            String              @id @default(cuid())
+  slug          String              @unique
+  titleFr       String
+  titleEn       String
+  descriptionFr String
+  descriptionEn String
+  level         String
+  courseId      String?
+  course        Course?             @relation(fields: [courseId], references: [id])
+  issued        CertificateIssued[]
+  createdAt     DateTime            @default(now())
+}
+
+model CertificateIssued {
+  id              String            @id @default(cuid())
+  uniqueCode      String            @unique
+  certificationId String
+  certification   Certification     @relation(fields: [certificationId], references: [id])
+  userId          String
+  user            User              @relation(fields: [userId], references: [id])
+  status          CertificateStatus @default(VALID)
+  issuedAt        DateTime          @default(now())
+  expiresAt       DateTime?
+  revokedAt       DateTime?
+  revokedReason   String?
+}
+
+model Payment {
+  id          String        @id @default(cuid())
+  userId      String
+  user        User          @relation(fields: [userId], references: [id])
+  amount      Decimal       @db.Decimal(10, 2)
+  currency    String        @default("USD")
+  provider    String
+  status      PaymentStatus @default(PENDING)
+  relatedType String
+  relatedId   String
+  createdAt   DateTime      @default(now())
+}

@@ -1,0 +1,29 @@
+"use client";
+
+import { useTranslations } from "next-intl";
+import { usePathname, useRouter } from "@/i18n/routing";
+import { useParams } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Globe } from "lucide-react";
+
+export function LanguageSwitcher() {
+  const t = useTranslations("nav");
+  const router = useRouter();
+  const pathname = usePathname();
+  const params = useParams();
+  const locale = params.locale as string;
+  const nextLocale = locale === "fr" ? "en" : "fr";
+
+  return (
+    <Button
+      variant="ghost"
+      size="sm"
+      onClick={() => router.replace(pathname, { locale: nextLocale })}
+      className="gap-1.5"
+      aria-label={t("home")}
+    >
+      <Globe className="h-4 w-4" />
+      {nextLocale.toUpperCase()}
+    </Button>
+  );
+}
