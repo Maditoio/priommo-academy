@@ -94,7 +94,7 @@ export default async function AdminCoursesPage({
   };
 
   return (
-    <AdminShell labels={labels} currentPath="/admin/courses">
+    <AdminShell locale={locale} labels={labels} currentPath="/admin/courses">
       <div className="flex items-center justify-between">
         <h1 className="text-[1.875rem] font-semibold text-ink">{ta("courses")}</h1>
         <Button asChild>
@@ -143,8 +143,7 @@ export default async function AdminCoursesPage({
                 <div className="flex items-center gap-1">
                   <Button asChild variant="ghost" size="sm">
                     <Link href={`/admin/courses/${r.id}`}>
-                      <MaterialIcon name="visibility" size={18} />
-                      {locale === "fr" ? "Voir" : "View"}
+                      {locale === "fr" ? "Ouvrir" : "Open"}
                     </Link>
                   </Button>
                   <Button asChild variant="ghost" size="sm">

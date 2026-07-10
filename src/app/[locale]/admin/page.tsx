@@ -52,7 +52,7 @@ export default async function AdminOverviewPage({
   };
 
   return (
-    <AdminShell labels={labels} currentPath="/admin">
+    <AdminShell locale={locale} labels={labels} currentPath="/admin">
       <h1 className="text-[1.875rem] font-semibold text-ink">{ta("overview")}</h1>
       <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat) => (

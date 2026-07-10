@@ -59,8 +59,8 @@ export default async function AdminUsersPage({
   };
 
   return (
-    <AdminShell labels={labels} currentPath="/admin/users">
-      <h1 className="font-display text-3xl font-semibold tracking-tight text-navy">{ta("users")}</h1>
+    <AdminShell locale={locale} labels={labels} currentPath="/admin/users">
+      <h1 className="text-[1.875rem] font-semibold text-ink">{ta("users")}</h1>
       <div className="mt-6">
         <DataTable
           columns={[

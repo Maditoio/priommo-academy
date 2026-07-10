@@ -50,7 +50,7 @@ export default async function AdminEnrollmentDetailPage({
   };
 
   return (
-    <AdminShell labels={labels} currentPath="/admin/enrollments">
+    <AdminShell locale={locale} labels={labels} currentPath="/admin/enrollments">
       <h1 className="font-display text-3xl font-semibold tracking-tight text-navy">{enrollment.user.name}</h1>
       <p className="text-muted-foreground">{enrollment.course.titleFr}</p>
 

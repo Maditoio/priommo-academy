@@ -62,7 +62,7 @@ export default async function AdminCertificatesPage({
   };
 
   return (
-    <AdminShell labels={labels} currentPath="/admin/certificates">
+    <AdminShell locale={locale} labels={labels} currentPath="/admin/certificates">
       <h1 className="text-[1.875rem] font-semibold text-ink">{ta("certificates")}</h1>
       <div className="mt-6">
         <DataTable

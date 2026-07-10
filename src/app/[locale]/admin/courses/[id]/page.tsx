@@ -156,7 +156,7 @@ export default async function AdminCourseDetailPage({
   };
 
   return (
-    <AdminShell labels={shellLabels} currentPath="/admin/courses">
+    <AdminShell locale={locale} labels={shellLabels} currentPath="/admin/courses">
       <Suspense fallback={<div className="py-12 text-ink-muted">Loading…</div>}>
         <CourseDetailAdmin
           locale={locale}

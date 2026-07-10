@@ -1,14 +1,14 @@
 import { db } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth";
-import { createOrganization } from "@/actions/enrollment";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { DataTable } from "@/components/admin/data-table";
+import { OrganizationsAdmin } from "@/components/admin/organizations-admin";
 import { Pagination } from "@/components/admin/pagination";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent } from "@/components/ui/card";
+import { MaterialIcon } from "@/components/ui/material-icon";
+import { Link } from "@/i18n/routing";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { Suspense } from "react";
 
 export default async function AdminOrganizationsPage({
   params,
@@ -23,6 +23,7 @@ export default async function AdminOrganizationsPage({
   await requireAdmin();
 
   const ta = await getTranslations("admin");
+  const tc = await getTranslations("common");
   const te = await getTranslations("exam");
   const page = Number(sp.page ?? 1);
   const pageSize = Number(sp.pageSize ?? 10);
@@ -50,49 +51,55 @@ export default async function AdminOrganizationsPage({
     levels: te("levels"),
   };
 
-  return (
-    <AdminShell labels={labels} currentPath="/admin/organizations">
-      <h1 className="text-[1.875rem] font-semibold text-ink">{ta("organizations")}</h1>
+  const modalLabels = {
+    createOrganization: ta("createOrganization"),
+    save: tc("save"),
+    cancel: tc("cancel"),
+    orgName: ta("orgName"),
+    orgType: ta("orgType"),
+    orgEmail: ta("orgEmail"),
+    orgSeats: ta("orgSeats"),
+    createOrganizationDesc: ta("createOrganizationDesc"),
+  };
 
-      <Card className="mt-6 shadow-sm">
-        <CardContent className="pt-6">
-          <form action={createOrganization.bind(null, locale)} className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-2">
-              <Label>Name</Label>
-              <Input name="name" required />
-            </div>
-            <div className="space-y-2">
-              <Label>Type</Label>
-              <Input name="type" placeholder="agence, banque..." required />
-            </div>
-            <div className="space-y-2">
-              <Label>Contact email</Label>
-              <Input name="contactEmail" type="email" required />
-            </div>
-            <div className="space-y-2">
-              <Label>Seats</Label>
-              <Input name="seats" type="number" defaultValue={10} required />
-            </div>
-            <Button type="submit" className="sm:col-span-2 w-fit">{ta("createOrganization")}</Button>
-          </form>
-        </CardContent>
-      </Card>
+  return (
+    <AdminShell locale={locale} labels={labels} currentPath="/admin/organizations">
+      <div className="flex items-center justify-between gap-4">
+        <h1 className="text-[1.875rem] font-semibold text-ink">{ta("organizations")}</h1>
+        <Button asChild>
+          <Link href="/admin/organizations?modal=create">
+            <MaterialIcon name="add" size={18} />
+            {ta("createOrganization")}
+          </Link>
+        </Button>
+      </div>
 
       <div className="mt-6">
         <DataTable
           columns={[
-            { key: "name", header: "Name", cell: (r) => r.name },
-            { key: "type", header: "Type", cell: (r) => r.type },
-            { key: "email", header: "Email", cell: (r) => r.contactEmail },
-            { key: "seats", header: "Seats", cell: (r) => r.seats },
-            { key: "members", header: "Members", cell: (r) => r._count.members },
+            { key: "name", header: ta("orgName"), cell: (r) => r.name },
+            { key: "type", header: ta("orgType"), cell: (r) => r.type },
+            { key: "email", header: ta("orgEmail"), cell: (r) => r.contactEmail },
+            { key: "seats", header: ta("orgSeats"), cell: (r) => r.seats },
+            { key: "members", header: ta("members"), cell: (r) => r._count.members },
           ]}
           data={orgs}
+          emptyMessage={ta("noOrganizations")}
         />
       </div>
       <div className="mt-4">
-        <Pagination page={page} pageSize={pageSize} total={total} showingLabel={ta("showing")} pageSizeLabel={ta("pageSize")} />
+        <Pagination
+          page={page}
+          pageSize={pageSize}
+          total={total}
+          showingLabel={ta("showing")}
+          pageSizeLabel={ta("pageSize")}
+        />
       </div>
+
+      <Suspense>
+        <OrganizationsAdmin locale={locale} labels={modalLabels} />
+      </Suspense>
     </AdminShell>
   );
 }

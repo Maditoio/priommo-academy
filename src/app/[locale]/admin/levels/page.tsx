@@ -47,7 +47,7 @@ export default async function AdminLevelsPage({
   };
 
   return (
-    <AdminShell labels={labels} currentPath="/admin/levels">
+    <AdminShell locale={locale} labels={labels} currentPath="/admin/levels">
       <div className="flex items-center justify-between">
         <h1 className="flex items-center gap-2 text-[1.875rem] font-semibold text-ink">
           <MaterialIcon name="signal_cellular_alt" className="text-accent" size={28} />

@@ -76,7 +76,7 @@ export default async function AdminCertificationsPage({
   };
 
   return (
-    <AdminShell labels={labels} currentPath="/admin/certifications">
+    <AdminShell locale={locale} labels={labels} currentPath="/admin/certifications">
       <div className="flex items-center justify-between">
         <h1 className="text-[1.875rem] font-semibold text-ink">{ta("certifications")}</h1>
         <Button asChild>
