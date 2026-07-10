@@ -92,7 +92,19 @@ export default async function AdminLevelsPage({
       </div>
 
       <Suspense>
-        <LevelsAdmin locale={locale} editLevel={editLevel} labels={labels} />
+        <LevelsAdmin
+          locale={locale}
+          editLevel={editLevel}
+          labels={{
+            addLevel: te("addLevel"),
+            edit: tc("edit"),
+            save: tc("save"),
+            cancel: tc("cancel"),
+            nameFr: te("nameFr"),
+            nameEn: te("nameEn"),
+            rank: "Rank",
+          }}
+        />
       </Suspense>
     </AdminShell>
   );

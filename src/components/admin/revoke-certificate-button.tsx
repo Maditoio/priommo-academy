@@ -3,15 +3,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { revokeCertificateAction } from "@/actions/enrollment";
+import { FormDialog } from "@/components/admin/form-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { MaterialIcon } from "@/components/ui/material-icon";
 import { toast } from "sonner";
 
 export function RevokeCertificateButton({
@@ -54,12 +50,9 @@ export function RevokeCertificateButton({
       <Button variant="destructive" size="sm" onClick={() => setOpen(true)}>
         {label}
       </Button>
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{label}</DialogTitle>
-          </DialogHeader>
-          <form onSubmit={handleSubmit} className="space-y-4">
+      <FormDialog open={open} onOpenChange={setOpen} title={label}>
+        <form onSubmit={handleSubmit} className="flex flex-col">
+          <div className="space-y-4 px-6 py-5">
             <div className="space-y-2">
               <Label htmlFor="reason">{reasonLabel}</Label>
               <Input
@@ -69,17 +62,18 @@ export function RevokeCertificateButton({
                 required
               />
             </div>
-            <div className="flex justify-end gap-2 pt-2">
-              <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
-                {cancelLabel}
-              </Button>
-              <Button type="submit" variant="destructive" disabled={loading}>
-                {confirmLabel}
-              </Button>
-            </div>
-          </form>
-        </DialogContent>
-      </Dialog>
+          </div>
+          <div className="flex gap-3 border-t border-border/60 bg-surface px-6 py-4">
+            <Button type="submit" variant="destructive" disabled={loading}>
+              <MaterialIcon name="block" size={18} />
+              {confirmLabel}
+            </Button>
+            <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
+              {cancelLabel}
+            </Button>
+          </div>
+        </form>
+      </FormDialog>
     </>
   );
 }

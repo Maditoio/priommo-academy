@@ -1,11 +1,10 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { Button } from "@/components/ui/button";
+import { FormActions } from "@/components/admin/form-actions";
+import { FormSheet } from "@/components/admin/form-sheet";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { MaterialIcon } from "@/components/ui/material-icon";
 import { createLevel, updateLevel } from "@/actions/levels";
 
 type Level = {
@@ -34,36 +33,38 @@ export function LevelsAdmin({ locale, editLevel, labels }: LevelsAdminProps) {
   }
 
   return (
-    <Sheet open={isOpen} onOpenChange={(open) => !open && closeSheet()}>
-      <SheetContent className="sm:max-w-md">
-        <SheetHeader>
-          <SheetTitle>{modal === "create" ? "New level" : "Edit level"}</SheetTitle>
-        </SheetHeader>
-        <form
-          action={async (fd) => {
-            if (level) await updateLevel(level.id, fd, locale);
-            else await createLevel(fd, locale);
-          }}
-          className="mt-6 space-y-4"
-        >
+    <FormSheet
+      open={isOpen}
+      onOpenChange={(open) => !open && closeSheet()}
+      title={modal === "create" ? labels.addLevel : labels.edit}
+    >
+      <form
+        action={async (fd) => {
+          if (level) await updateLevel(level.id, fd, locale);
+          else await createLevel(fd, locale);
+        }}
+        className="flex flex-col"
+      >
+        <div className="space-y-4 px-6 py-5">
           <div className="space-y-2">
-            <Label htmlFor="nameFr">Name (FR)</Label>
+            <Label htmlFor="nameFr">{labels.nameFr}</Label>
             <Input id="nameFr" name="nameFr" defaultValue={level?.nameFr} required />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="nameEn">Name (EN)</Label>
+            <Label htmlFor="nameEn">{labels.nameEn}</Label>
             <Input id="nameEn" name="nameEn" defaultValue={level?.nameEn} required />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="rank">Rank</Label>
+            <Label htmlFor="rank">{labels.rank}</Label>
             <Input id="rank" name="rank" type="number" defaultValue={level?.rank ?? 0} required />
           </div>
-          <Button type="submit">
-            <MaterialIcon name="save" size={18} />
-            Save
-          </Button>
-        </form>
-      </SheetContent>
-    </Sheet>
+        </div>
+        <FormActions
+          submitLabel={labels.save}
+          cancelLabel={labels.cancel}
+          onCancel={closeSheet}
+        />
+      </form>
+    </FormSheet>
   );
 }

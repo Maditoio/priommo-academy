@@ -1,12 +1,11 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { FormActions } from "@/components/admin/form-actions";
+import { FormSheet } from "@/components/admin/form-sheet";
 import { BilingualFields } from "@/components/admin/bilingual-fields";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { MaterialIcon } from "@/components/ui/material-icon";
 import { createCourse, updateCourse } from "@/actions/courses";
 
 type Level = { id: string; nameFr: string; nameEn: string };
@@ -44,21 +43,19 @@ export function CoursesAdmin({ locale, labels, levels, editCourse }: CoursesAdmi
   }
 
   return (
-    <Sheet open={isOpen} onOpenChange={(open) => !open && closeSheet()}>
-      <SheetContent className="overflow-y-auto sm:max-w-xl">
-        <SheetHeader>
-          <SheetTitle>
-            {modal === "create" ? labels.createCourse : course?.titleFr ?? labels.edit}
-          </SheetTitle>
-        </SheetHeader>
-
-        <form
-          action={async (fd) => {
-            if (course) await updateCourse(course.id, fd, locale);
-            else await createCourse(fd, locale);
-          }}
-          className="mt-6 space-y-6"
-        >
+    <FormSheet
+      open={isOpen}
+      onOpenChange={(open) => !open && closeSheet()}
+      title={modal === "create" ? labels.createCourse : (course?.titleFr ?? labels.edit)}
+    >
+      <form
+        action={async (fd) => {
+          if (course) await updateCourse(course.id, fd, locale);
+          else await createCourse(fd, locale);
+        }}
+        className="flex flex-col"
+      >
+        <div className="space-y-6 px-6 py-5">
           <BilingualFields
             labels={{
               titleFr: labels.titleFr,
@@ -76,7 +73,7 @@ export function CoursesAdmin({ locale, labels, levels, editCourse }: CoursesAdmi
                 name="levelId"
                 defaultValue={course?.levelId}
                 required
-                className="flex h-10 w-full rounded-xl border border-border bg-surface px-3 text-sm"
+                className="flex h-10 w-full rounded-xl border border-border bg-surface px-3 text-sm shadow-sm transition-all duration-200 ease-out hover:border-accent/35 hover:shadow-md focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/25"
               >
                 {levels.map((l) => (
                   <option key={l.id} value={l.id}>
@@ -109,17 +106,13 @@ export function CoursesAdmin({ locale, labels, levels, editCourse }: CoursesAdmi
             <input type="checkbox" name="published" defaultChecked={course?.published} className="rounded" />
             {labels.publish}
           </label>
-          <div className="flex gap-3 pt-2">
-            <Button type="submit">
-              <MaterialIcon name="save" size={18} />
-              {labels.save}
-            </Button>
-            <Button type="button" variant="secondary" onClick={closeSheet}>
-              {labels.cancel ?? "Cancel"}
-            </Button>
-          </div>
-        </form>
-      </SheetContent>
-    </Sheet>
+        </div>
+        <FormActions
+          submitLabel={labels.save}
+          cancelLabel={labels.cancel ?? "Cancel"}
+          onCancel={closeSheet}
+        />
+      </form>
+    </FormSheet>
   );
 }

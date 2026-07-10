@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { FormSheet } from "@/components/admin/form-sheet";
+import { FormActions } from "@/components/admin/form-actions";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -321,19 +322,20 @@ export function ExamBuilder({
         </div>
       )}
 
-      <Sheet open={showQuestionForm} onOpenChange={setShowQuestionForm}>
-        <SheetContent className="overflow-y-auto sm:max-w-xl">
-          <SheetHeader>
-            <SheetTitle>{labels.addQuestion}</SheetTitle>
-          </SheetHeader>
-          {selected && (
-            <form
-              action={async (fd) => {
-                await addExamQuestion(selected.id, courseId, fd, locale);
-                setShowQuestionForm(false);
-              }}
-              className="mt-6 space-y-4"
-            >
+      <FormSheet
+        open={showQuestionForm}
+        onOpenChange={setShowQuestionForm}
+        title={labels.addQuestion}
+      >
+        {selected && (
+          <form
+            action={async (fd) => {
+              await addExamQuestion(selected.id, courseId, fd, locale);
+              setShowQuestionForm(false);
+            }}
+            className="flex flex-col"
+          >
+            <div className="space-y-4 px-6 py-5">
               <div className="space-y-2">
                 <Label>{labels.level}</Label>
                 <select
@@ -392,14 +394,15 @@ export function ExamBuilder({
                   ))}
                 </select>
               </div>
-              <Button type="submit" className="w-full">
-                <MaterialIcon name="save" size={18} />
-                {labels.save}
-              </Button>
-            </form>
-          )}
-        </SheetContent>
-      </Sheet>
+            </div>
+            <FormActions
+              submitLabel={labels.save}
+              cancelLabel={labels.cancel ?? "Cancel"}
+              onCancel={() => setShowQuestionForm(false)}
+            />
+          </form>
+        )}
+      </FormSheet>
     </>
   );
 }
