@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { MaterialIcon } from "@/components/ui/material-icon";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { redirect } from "next/navigation";
+import Image from "next/image";
 
 export default async function HomePage({
   params,
@@ -74,39 +75,75 @@ export default async function HomePage({
       <section className="relative overflow-hidden bg-ink text-white">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(180,83,9,0.35),transparent_55%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(255,255,255,0.06),transparent_50%)]" />
-        <div className="relative mx-auto max-w-7xl px-6 py-24 lg:px-12 lg:py-36">
-          <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-medium uppercase tracking-widest text-white/80 backdrop-blur-sm">
-              <MaterialIcon name="workspace_premium" size={16} />
-              PROIMMO Academy
+        <div className="relative mx-auto max-w-7xl px-6 py-16 lg:px-12 lg:py-24">
+          <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
+            <div className="max-w-xl">
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-medium uppercase tracking-widest text-white/80 backdrop-blur-sm">
+                <MaterialIcon name="workspace_premium" size={16} />
+                PROIMMO Academy
+              </div>
+              <h1 className="mt-6 text-4xl font-semibold tracking-tight sm:text-5xl lg:text-[3.25rem] lg:leading-[1.08]">
+                {t("heroTitle")}
+              </h1>
+              <p className="mt-6 text-lg leading-relaxed text-white/75">{t("heroSubtitle")}</p>
+              <div className="mt-10 flex flex-wrap gap-4">
+                <Button asChild size="lg" className="bg-white text-accent hover:bg-white/90">
+                  <Link href="/certifications">
+                    {t("ctaCertifications")}
+                    <MaterialIcon name="arrow_forward" size={18} />
+                  </Link>
+                </Button>
+                <Button
+                  asChild
+                  size="lg"
+                  variant="secondary"
+                  className="border-white/30 bg-white/10 text-white hover:bg-white/20"
+                >
+                  <Link href="/verify">{t("ctaVerify")}</Link>
+                </Button>
+                <Button
+                  asChild
+                  size="lg"
+                  variant="ghost"
+                  className="text-white hover:bg-white/10 hover:text-white"
+                >
+                  <Link href="/register">{t("ctaRegister")}</Link>
+                </Button>
+              </div>
             </div>
-            <h1 className="mt-6 text-4xl font-semibold tracking-tight sm:text-5xl lg:text-6xl lg:leading-[1.05]">
-              {t("heroTitle")}
-            </h1>
-            <p className="mt-6 max-w-2xl text-lg leading-relaxed text-white/75">{t("heroSubtitle")}</p>
-            <div className="mt-10 flex flex-wrap gap-4">
-              <Button asChild size="lg" className="bg-white text-accent hover:bg-white/90">
-                <Link href="/certifications">
-                  {t("ctaCertifications")}
-                  <MaterialIcon name="arrow_forward" size={18} />
-                </Link>
-              </Button>
-              <Button
-                asChild
-                size="lg"
-                variant="secondary"
-                className="border-white/30 bg-white/10 text-white hover:bg-white/20"
-              >
-                <Link href="/verify">{t("ctaVerify")}</Link>
-              </Button>
-              <Button
-                asChild
-                size="lg"
-                variant="ghost"
-                className="text-white hover:bg-white/10 hover:text-white"
-              >
-                <Link href="/register">{t("ctaRegister")}</Link>
-              </Button>
+
+            <div className="relative mx-auto w-full max-w-lg lg:max-w-none">
+              <div className="absolute -inset-4 rounded-3xl bg-accent/20 blur-3xl" aria-hidden />
+              <div className="relative overflow-hidden rounded-3xl border border-white/10 shadow-2xl">
+                <Image
+                  src="/images/hero-certification.jpg"
+                  alt={
+                    locale === "fr"
+                      ? "Professionnel immobilier certifié PROIMMO Academy"
+                      : "PROIMMO Academy certified real estate professional"
+                  }
+                  width={640}
+                  height={480}
+                  className="aspect-[4/3] w-full object-cover"
+                  priority
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-ink/50 via-transparent to-transparent" />
+                <div className="absolute bottom-4 left-4 right-4 flex items-center gap-3 rounded-2xl border border-white/15 bg-ink/60 px-4 py-3 backdrop-blur-md">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent/90">
+                    <MaterialIcon name="verified" size={22} className="text-white" />
+                  </span>
+                  <div>
+                    <p className="text-sm font-semibold text-white">
+                      {locale === "fr" ? "Certification vérifiable" : "Verifiable certification"}
+                    </p>
+                    <p className="text-xs text-white/70">
+                      {locale === "fr"
+                        ? "Formation, examen officiel et certificat numérique"
+                        : "Training, official exam, and digital certificate"}
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
