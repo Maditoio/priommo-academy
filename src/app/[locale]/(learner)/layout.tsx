@@ -33,7 +33,11 @@ export default async function LearnerLayout({
     browseCourses: td("browseCourses"),
     verify: t("verify"),
     admin: t("admin"),
+    adminPanel: td("adminPanel"),
     logout: t("logout"),
+    language: td("language"),
+    collapseSidebar: td("collapseSidebar"),
+    expandSidebar: td("expandSidebar"),
   };
 
   return (

@@ -1,38 +1,37 @@
 "use client";
 
-import { Link, usePathname } from "@/i18n/routing";
+import { Link } from "@/i18n/routing";
 import { cn } from "@/lib/utils";
 import { MaterialIcon } from "@/components/ui/material-icon";
 
 const navItems = [
-  { href: "/dashboard", labelKey: "overview", icon: "dashboard", exact: true },
-  { href: "/dashboard/courses", labelKey: "browseCourses", icon: "menu_book" },
-  { href: "/dashboard/certificates", labelKey: "certificates", icon: "workspace_premium" },
-  { href: "/dashboard/verify", labelKey: "verify", icon: "verified" },
-  { href: "/profile", labelKey: "profile", icon: "manage_accounts" },
+  { href: "/admin", labelKey: "overview", icon: "dashboard" },
+  { href: "/admin/levels", labelKey: "levels", icon: "signal_cellular_alt" },
+  { href: "/admin/courses", labelKey: "courses", icon: "menu_book" },
+  { href: "/admin/certifications", labelKey: "certifications", icon: "workspace_premium" },
+  { href: "/admin/enrollments", labelKey: "enrollments", icon: "how_to_reg" },
+  { href: "/admin/certificates", labelKey: "certificates", icon: "verified" },
+  { href: "/admin/users", labelKey: "users", icon: "group" },
+  { href: "/admin/organizations", labelKey: "organizations", icon: "apartment" },
+  { href: "/admin/payments", labelKey: "payments", icon: "payments" },
 ];
 
-export function LearnerSidebarNav({
+export function AdminSidebarNav({
   labels,
-  showAdmin,
+  currentPath,
   collapsed = false,
+  onNavigate,
 }: {
   labels: Record<string, string>;
-  showAdmin: boolean;
+  currentPath: string;
   collapsed?: boolean;
+  onNavigate?: () => void;
 }) {
-  const pathname = usePathname();
-
-  const allItems = showAdmin
-    ? [...navItems, { href: "/admin", labelKey: "admin", icon: "admin_panel_settings" }]
-    : navItems;
-
   return (
-    <nav className="space-y-0.5">
-      {allItems.map((item) => {
-        const isActive = item.exact
-          ? pathname === item.href
-          : pathname === item.href || pathname.startsWith(`${item.href}/`);
+    <nav className="space-y-0.5" onClick={onNavigate}>
+      {navItems.map((item) => {
+        const isActive =
+          currentPath === item.href || (item.href !== "/admin" && currentPath.startsWith(item.href));
         return (
           <Link
             key={item.href}
