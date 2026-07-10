@@ -607,6 +607,40 @@ async function main() {
     },
   });
 
+  await prisma.certification.upsert({
+    where: { slug: "cert-specialiste-immobilier" },
+    update: { rank: 3, validityMonths: 36, levelId: levels.specialise.id },
+    create: {
+      slug: "cert-specialiste-immobilier",
+      titleFr: "Certificat Spécialiste Immobilier",
+      titleEn: "Real Estate Specialist Certificate",
+      descriptionFr:
+        "Certification spécialisée pour les experts en évaluation, investissement et transactions complexes.",
+      descriptionEn:
+        "Specialized certification for experts in valuation, investment, and complex transactions.",
+      levelId: levels.specialise.id,
+      rank: 3,
+      validityMonths: 36,
+    },
+  });
+
+  await prisma.certification.upsert({
+    where: { slug: "cert-directeur-immobilier" },
+    update: { rank: 4, validityMonths: 48, levelId: levels.executif.id },
+    create: {
+      slug: "cert-directeur-immobilier",
+      titleFr: "Certificat Directeur Immobilier Exécutif",
+      titleEn: "Executive Real Estate Director Certificate",
+      descriptionFr:
+        "Certification exécutive pour les dirigeants, promoteurs et responsables de stratégie immobilière.",
+      descriptionEn:
+        "Executive certification for leaders, developers, and real estate strategy executives.",
+      levelId: levels.executif.id,
+      rank: 4,
+      validityMonths: 48,
+    },
+  });
+
   await prisma.enrollment.upsert({
     where: { userId_courseId: { userId: learner.id, courseId: course1.id } },
     update: { progressPct: 85 },

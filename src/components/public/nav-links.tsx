@@ -16,8 +16,8 @@ export function NavLinks({ courses, certifications, verify, extraLinks = [] }: N
   const pathname = usePathname();
 
   const links = [
-    { href: "/courses", label: courses },
     { href: "/certifications", label: certifications },
+    { href: "/courses", label: courses },
     { href: "/verify", label: verify },
     ...extraLinks,
   ];
