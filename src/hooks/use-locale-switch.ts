@@ -16,7 +16,8 @@ export function useLocaleSwitch() {
 
   function switchTo(nextLocale: string) {
     if (nextLocale === locale) return;
-    router.replace(pathname, { locale: nextLocale });
+    const search = typeof window !== "undefined" ? window.location.search : "";
+    router.replace(`${pathname}${search}`, { locale: nextLocale });
   }
 
   return { locale, switchTo, locales: SUPPORTED_LOCALES };

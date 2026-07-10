@@ -78,19 +78,57 @@ export async function addLesson(moduleId: string, courseId: string, formData: Fo
   await requireAdmin();
   const raw = Object.fromEntries(formData.entries());
   const parsed = lessonSchema.safeParse(raw);
-  if (!parsed.success) return;
+  if (!parsed.success) {
+    adminRedirect(`/${locale}/admin/courses/${courseId}?tab=curriculum`, "Invalid lesson data", "error");
+  }
 
   await db.lesson.create({
     data: {
-      ...parsed.data,
+      ...parsed.data!,
       moduleId,
-      contentUrl: parsed.data.contentUrl || null,
-      bodyFr: parsed.data.bodyFr || null,
-      bodyEn: parsed.data.bodyEn || null,
-      durationMin: parsed.data.durationMin ?? null,
+      contentUrl: parsed.data!.contentUrl || null,
+      bodyFr: parsed.data!.bodyFr || null,
+      bodyEn: parsed.data!.bodyEn || null,
+      durationMin: parsed.data!.durationMin ?? null,
     },
   });
   revalidatePath(`/${locale}/admin/courses`);
   revalidatePath(`/${locale}/admin/courses/${courseId}`);
   adminRedirect(`/${locale}/admin/courses/${courseId}`, "Lesson added");
+}
+
+export async function updateLesson(
+  lessonId: string,
+  courseId: string,
+  formData: FormData,
+  locale: string
+) {
+  await requireAdmin();
+  const raw = Object.fromEntries(formData.entries());
+  const parsed = lessonSchema.safeParse(raw);
+  if (!parsed.success) {
+    adminRedirect(`/${locale}/admin/courses/${courseId}?tab=curriculum`, "Invalid lesson data", "error");
+  }
+
+  await db.lesson.update({
+    where: { id: lessonId },
+    data: {
+      ...parsed.data!,
+      contentUrl: parsed.data!.contentUrl || null,
+      bodyFr: parsed.data!.bodyFr || null,
+      bodyEn: parsed.data!.bodyEn || null,
+      durationMin: parsed.data!.durationMin ?? null,
+    },
+  });
+  revalidatePath(`/${locale}/admin/courses`);
+  revalidatePath(`/${locale}/admin/courses/${courseId}`);
+  adminRedirect(`/${locale}/admin/courses/${courseId}?tab=curriculum`, "Lesson updated");
+}
+
+export async function deleteLesson(lessonId: string, courseId: string, locale: string) {
+  await requireAdmin();
+  await db.lesson.delete({ where: { id: lessonId } });
+  revalidatePath(`/${locale}/admin/courses`);
+  revalidatePath(`/${locale}/admin/courses/${courseId}`);
+  adminRedirect(`/${locale}/admin/courses/${courseId}?tab=curriculum`, "Lesson deleted");
 }

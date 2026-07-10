@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth";
-import { addModule, addLesson } from "@/actions/courses";
+import { addModule, addLesson, updateLesson, deleteLesson } from "@/actions/courses";
 import { addExamCategory } from "@/actions/exams";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { CourseDetailAdmin } from "@/components/admin/course-detail-admin";
@@ -65,6 +65,18 @@ export default async function AdminCourseDetailPage({
     await addLesson(moduleId, course!.id, formData, locale);
   }
 
+  async function updateLessonAction(formData: FormData) {
+    "use server";
+    const lessonId = String(formData.get("lessonId") ?? "");
+    if (!lessonId) return;
+    await updateLesson(lessonId, course!.id, formData, locale);
+  }
+
+  async function deleteLessonAction(lessonId: string) {
+    "use server";
+    await deleteLesson(lessonId, course!.id, locale);
+  }
+
   async function addCategoryAction(formData: FormData) {
     "use server";
     await addExamCategory(course!.id, formData, locale);
@@ -110,6 +122,18 @@ export default async function AdminCourseDetailPage({
     moduleOrder: te("moduleOrder"),
     lessonOrder: te("lessonOrder"),
     duration: te("duration"),
+    contentType: ta("contentType"),
+    contentUrl: ta("contentUrl"),
+    bodyFr: ta("bodyFr"),
+    bodyEn: ta("bodyEn"),
+    editLesson: ta("editLesson"),
+    delete: tc("delete"),
+    contentTypeText: ta("contentTypeText"),
+    contentTypeVideo: ta("contentTypeVideo"),
+    contentTypePdf: ta("contentTypePdf"),
+    lessonEditDesc: ta("lessonEditDesc"),
+    save: tc("save"),
+    cancel: tc("cancel"),
     categoriesSubtitle: te("categoriesSubtitle"),
     curriculumSubtitle: te("curriculumSubtitle"),
     examsSubtitle: te("examsSubtitle"),
@@ -166,6 +190,8 @@ export default async function AdminCourseDetailPage({
           onAddModule={addModuleAction}
           onAddLesson={addLessonFromForm}
           onAddCategory={addCategoryAction}
+          onUpdateLesson={updateLessonAction}
+          onDeleteLesson={deleteLessonAction}
         />
       </Suspense>
     </AdminShell>

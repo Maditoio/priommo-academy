@@ -1,7 +1,9 @@
 "use client";
 
+import { useState, useTransition } from "react";
 import { signOut } from "next-auth/react";
 import { useLocaleSwitch } from "@/hooks/use-locale-switch";
+import { useRouter } from "@/i18n/routing";
 import { UserAvatar } from "@/components/ui/user-avatar";
 import { MaterialIcon } from "@/components/ui/material-icon";
 import {
@@ -12,7 +14,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Link } from "@/i18n/routing";
 import { cn } from "@/lib/utils";
 
 export interface AccountMenuLink {
@@ -43,10 +44,32 @@ export function AccountMenu({
   collapsed = false,
   side = "top",
 }: AccountMenuProps) {
+  const router = useRouter();
   const { switchTo, locales } = useLocaleSwitch();
+  const [open, setOpen] = useState(false);
+  const [, startTransition] = useTransition();
+
+  function navigateAfterClose(href: string) {
+    setOpen(false);
+    startTransition(() => {
+      router.push(href);
+    });
+  }
+
+  function switchLocaleAfterClose(nextLocale: string) {
+    setOpen(false);
+    startTransition(() => {
+      switchTo(nextLocale);
+    });
+  }
+
+  function logoutAfterClose() {
+    setOpen(false);
+    signOut({ callbackUrl: `/${locale}` });
+  }
 
   return (
-    <DropdownMenu>
+    <DropdownMenu open={open} onOpenChange={setOpen} modal={false}>
       <DropdownMenuTrigger
         className={cn(
           "group flex w-full items-center gap-3 rounded-2xl p-2 text-left outline-none transition-colors duration-150 hover:bg-surface-hover focus-visible:ring-2 focus-visible:ring-accent/25 data-[state=open]:bg-surface-hover",
@@ -82,11 +105,15 @@ export function AccountMenu({
           <>
             <DropdownMenuSeparator />
             {links.map((link) => (
-              <DropdownMenuItem key={link.href} asChild>
-                <Link href={link.href} className="flex items-center gap-2.5">
-                  <MaterialIcon name={link.icon} size={18} className="shrink-0" />
-                  {link.label}
-                </Link>
+              <DropdownMenuItem
+                key={link.href}
+                onSelect={(e) => {
+                  e.preventDefault();
+                  navigateAfterClose(link.href);
+                }}
+              >
+                <MaterialIcon name={link.icon} size={18} className="shrink-0" />
+                {link.label}
               </DropdownMenuItem>
             ))}
           </>
@@ -95,7 +122,13 @@ export function AccountMenu({
         <DropdownMenuSeparator />
         <DropdownMenuLabel>{labels.language}</DropdownMenuLabel>
         {locales.map((l) => (
-          <DropdownMenuItem key={l.code} onSelect={() => switchTo(l.code)}>
+          <DropdownMenuItem
+            key={l.code}
+            onSelect={(e) => {
+              e.preventDefault();
+              switchLocaleAfterClose(l.code);
+            }}
+          >
             <span className="flex-1">{l.label}</span>
             {l.code === locale && <MaterialIcon name="check" size={16} className="text-accent" />}
           </DropdownMenuItem>
@@ -105,7 +138,10 @@ export function AccountMenu({
         <DropdownMenuItem
           icon="logout"
           destructive
-          onSelect={() => signOut({ callbackUrl: `/${locale}` })}
+          onSelect={(e) => {
+            e.preventDefault();
+            logoutAfterClose();
+          }}
         >
           {labels.logout}
         </DropdownMenuItem>

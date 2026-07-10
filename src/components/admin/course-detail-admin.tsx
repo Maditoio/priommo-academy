@@ -3,18 +3,20 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { Link } from "@/i18n/routing";
 import { ExamBuilder } from "@/components/admin/exam-builder";
+import { LessonAdminSheet, type LessonFormData } from "@/components/admin/lesson-admin-sheet";
 import { StatusBadge } from "@/components/public/status-badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { MaterialIcon } from "@/components/ui/material-icon";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 
 type TabId = "curriculum" | "categories" | "exams";
 
-type Lesson = { id: string; titleFr: string; titleEn: string; durationMin: number | null; order: number };
+type Lesson = LessonFormData;
 type Module = { id: string; titleFr: string; titleEn: string; order: number; lessons: Lesson[] };
 type Category = { id: string; nameFr: string; nameEn: string; slug: string };
 type Level = { id: string; nameFr: string; nameEn: string };
@@ -82,6 +84,18 @@ type Labels = {
   moduleOrder: string;
   lessonOrder: string;
   duration: string;
+  contentType: string;
+  contentUrl: string;
+  bodyFr: string;
+  bodyEn: string;
+  editLesson: string;
+  delete: string;
+  contentTypeText: string;
+  contentTypeVideo: string;
+  contentTypePdf: string;
+  lessonEditDesc: string;
+  save: string;
+  cancel: string;
   categoriesSubtitle: string;
   curriculumSubtitle: string;
   examsSubtitle: string;
@@ -96,6 +110,8 @@ interface CourseDetailAdminProps {
   onAddModule: (formData: FormData) => Promise<void>;
   onAddLesson: (formData: FormData) => Promise<void>;
   onAddCategory: (formData: FormData) => Promise<void>;
+  onUpdateLesson: (formData: FormData) => Promise<void>;
+  onDeleteLesson: (lessonId: string) => Promise<void>;
 }
 
 const TABS: { id: TabId; icon: string }[] = [
@@ -112,6 +128,8 @@ export function CourseDetailAdmin({
   onAddModule,
   onAddLesson,
   onAddCategory,
+  onUpdateLesson,
+  onDeleteLesson,
 }: CourseDetailAdminProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -120,11 +138,20 @@ export function CourseDetailAdmin({
 
   const lessonCount = course.modules.reduce((n, m) => n + m.lessons.length, 0);
   const questionCount = course.exams.reduce((n, e) => n + e.questions.length, 0);
+  const allLessons = course.modules.flatMap((m) => m.lessons);
+
+  function openLessonEditor(lessonId: string) {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("tab", "curriculum");
+    params.set("lesson", lessonId);
+    router.push(`/${locale}/admin/courses/${course.id}?${params.toString()}`);
+  }
 
   function setTab(tab: TabId) {
     const params = new URLSearchParams(searchParams.toString());
     params.set("tab", tab);
     if (tab !== "exams") params.delete("exam");
+    params.delete("lesson");
     router.push(`/${locale}/admin/courses/${course.id}?${params.toString()}`);
   }
 
@@ -229,6 +256,7 @@ export function CourseDetailAdmin({
           labels={labels}
           onAddModule={onAddModule}
           onAddLesson={onAddLesson}
+          onEditLesson={openLessonEditor}
         />
       )}
 
@@ -251,6 +279,33 @@ export function CourseDetailAdmin({
           />
         </div>
       )}
+
+      <LessonAdminSheet
+        locale={locale}
+        courseId={course.id}
+        lessons={allLessons}
+        labels={{
+          editLesson: labels.editLesson,
+          addLesson: labels.addLesson,
+          save: labels.save,
+          cancel: labels.cancel,
+          delete: labels.delete,
+          titleFr: labels.titleFr,
+          titleEn: labels.titleEn,
+          contentType: labels.contentType,
+          contentUrl: labels.contentUrl,
+          bodyFr: labels.bodyFr,
+          bodyEn: labels.bodyEn,
+          lessonOrder: labels.lessonOrder,
+          duration: labels.duration,
+          contentTypeText: labels.contentTypeText,
+          contentTypeVideo: labels.contentTypeVideo,
+          contentTypePdf: labels.contentTypePdf,
+          lessonEditDesc: labels.lessonEditDesc,
+        }}
+        onUpdateLesson={onUpdateLesson}
+        onDeleteLesson={onDeleteLesson}
+      />
     </div>
   );
 }
@@ -277,16 +332,24 @@ function StatCell({
   );
 }
 
+function lessonContentIcon(contentType: string) {
+  if (contentType === "video") return "play_circle";
+  if (contentType === "pdf") return "picture_as_pdf";
+  return "article";
+}
+
 function CurriculumTab({
   course,
   labels,
   onAddModule,
   onAddLesson,
+  onEditLesson,
 }: {
   course: CourseDetailData;
   labels: Labels;
   onAddModule: (formData: FormData) => Promise<void>;
   onAddLesson: (formData: FormData) => Promise<void>;
+  onEditLesson: (lessonId: string) => void;
 }) {
   return (
     <div className="space-y-6">
@@ -320,12 +383,19 @@ function CurriculumTab({
               <CardContent className="pt-4">
                 {mod.lessons.length > 0 ? (
                   <ul className="space-y-2">
-                    {mod.lessons.map((lesson) => (
+                    {mod.lessons.map((lesson, lessonIndex) => (
                       <li
                         key={lesson.id}
                         className="flex items-center gap-3 rounded-xl border border-border bg-bg/50 px-4 py-3"
                       >
-                        <MaterialIcon name="menu_book" size={18} className="shrink-0 text-accent" />
+                        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-accent-soft text-xs font-semibold text-accent">
+                          {lessonIndex + 1}
+                        </span>
+                        <MaterialIcon
+                          name={lessonContentIcon(lesson.contentType)}
+                          size={18}
+                          className="shrink-0 text-accent"
+                        />
                         <div className="min-w-0 flex-1">
                           <p className="text-sm font-medium text-ink">{lesson.titleFr}</p>
                           <p className="text-xs text-ink-muted">{lesson.titleEn}</p>
@@ -336,6 +406,17 @@ function CurriculumTab({
                             {lesson.durationMin} min
                           </span>
                         )}
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="h-9 w-9 shrink-0"
+                          title={labels.editLesson}
+                          aria-label={labels.editLesson}
+                          onClick={() => onEditLesson(lesson.id)}
+                        >
+                          <MaterialIcon name="edit" size={18} />
+                        </Button>
                       </li>
                     ))}
                   </ul>
@@ -360,7 +441,34 @@ function CurriculumTab({
                       <Label className="text-xs">{labels.titleEn}</Label>
                       <Input name="titleEn" required />
                     </div>
-                    <input type="hidden" name="contentType" value="text" />
+                    <div className="space-y-1.5">
+                      <Label className="text-xs">{labels.contentType}</Label>
+                      <select
+                        name="contentType"
+                        defaultValue="text"
+                        className="flex h-10 w-full rounded-xl border border-border bg-surface px-3 text-sm shadow-sm focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/25"
+                      >
+                        <option value="text">{labels.contentTypeText}</option>
+                        <option value="video">{labels.contentTypeVideo}</option>
+                        <option value="pdf">{labels.contentTypePdf}</option>
+                      </select>
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label className="text-xs">{labels.duration}</Label>
+                      <Input name="durationMin" type="number" min={0} placeholder="15" />
+                    </div>
+                    <div className="space-y-1.5 sm:col-span-2">
+                      <Label className="text-xs">{labels.contentUrl}</Label>
+                      <Input name="contentUrl" type="url" placeholder="https://..." />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label className="text-xs">{labels.bodyFr}</Label>
+                      <Textarea name="bodyFr" rows={3} className="resize-y" />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label className="text-xs">{labels.bodyEn}</Label>
+                      <Textarea name="bodyEn" rows={3} className="resize-y" />
+                    </div>
                     <input type="hidden" name="order" value={mod.lessons.length} />
                   </div>
                   <Button type="submit" size="sm" variant="secondary">

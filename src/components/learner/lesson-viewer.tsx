@@ -80,10 +80,10 @@ export async function LessonViewer({ locale, enrollmentId, lessonId }: LessonVie
             )}
           </div>
 
-          <Card className="shadow-sm">
-            <CardContent className="prose prose-zinc max-w-none pt-6">
+          <Card className="overflow-hidden shadow-sm">
+            <CardContent className="p-0">
               {lesson.contentType === "video" && lesson.contentUrl ? (
-                <div className="aspect-video overflow-hidden rounded-xl bg-ink">
+                <div className="aspect-video bg-ink">
                   <iframe
                     src={lesson.contentUrl}
                     title={localizedField(lesson, "title", locale)}
@@ -91,11 +91,24 @@ export async function LessonViewer({ locale, enrollmentId, lessonId }: LessonVie
                     allowFullScreen
                   />
                 </div>
-              ) : (
-                <div className="whitespace-pre-wrap text-[0.9375rem] leading-relaxed text-ink">
+              ) : lesson.contentType === "pdf" && lesson.contentUrl ? (
+                <div className="border-b border-border bg-surface-hover/40 px-6 py-4">
+                  <a
+                    href={lesson.contentUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 text-sm font-medium text-accent hover:underline"
+                  >
+                    <MaterialIcon name="picture_as_pdf" size={18} />
+                    {locale === "fr" ? "Ouvrir le document PDF" : "Open PDF document"}
+                  </a>
+                </div>
+              ) : null}
+              <div className="px-6 py-6">
+                <div className="prose prose-zinc max-w-none whitespace-pre-wrap text-[0.9375rem] leading-relaxed text-ink">
                   {body}
                 </div>
-              )}
+              </div>
             </CardContent>
           </Card>
 
