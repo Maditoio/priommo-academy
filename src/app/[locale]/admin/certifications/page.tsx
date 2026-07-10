@@ -102,8 +102,10 @@ export default async function AdminCertificationsPage({
               key: "actions",
               header: tc("actions"),
               cell: (r) => (
-                <Button asChild variant="ghost" size="sm">
-                  <Link href={`/admin/certifications?modal=edit&id=${r.id}`}>{tc("edit")}</Link>
+                <Button asChild variant="ghost" size="icon" className="h-9 w-9">
+                  <Link href={`/admin/certifications?modal=edit&id=${r.id}`} title={tc("edit")} aria-label={tc("edit")}>
+                    <MaterialIcon name="edit" size={18} />
+                  </Link>
                 </Button>
               ),
             },

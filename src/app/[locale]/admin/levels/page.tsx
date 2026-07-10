@@ -72,14 +72,13 @@ export default async function AdminLevelsPage({
               header: tc("actions"),
               cell: (r) => (
                 <div className="flex gap-1">
-                  <Button asChild variant="ghost" size="sm">
-                    <Link href={`/admin/levels?modal=edit&id=${r.id}`}>
+                  <Button asChild variant="ghost" size="icon" className="h-9 w-9">
+                    <Link href={`/admin/levels?modal=edit&id=${r.id}`} title={tc("edit")} aria-label={tc("edit")}>
                       <MaterialIcon name="edit" size={18} />
-                      {tc("edit")}
                     </Link>
                   </Button>
                   <form action={deleteLevel.bind(null, r.id, locale)}>
-                    <Button type="submit" variant="ghost" size="sm">
+                    <Button type="submit" variant="ghost" size="icon" className="h-9 w-9 text-danger hover:text-danger" title={tc("delete")} aria-label={tc("delete")}>
                       <MaterialIcon name="delete" size={18} />
                     </Button>
                   </form>

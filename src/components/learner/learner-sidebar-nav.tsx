@@ -16,10 +16,12 @@ export function LearnerSidebarNav({
   labels,
   showAdmin,
   collapsed = false,
+  onNavigate,
 }: {
   labels: Record<string, string>;
   showAdmin: boolean;
   collapsed?: boolean;
+  onNavigate?: () => void;
 }) {
   const pathname = usePathname();
 
@@ -37,6 +39,7 @@ export function LearnerSidebarNav({
           <Link
             key={item.href}
             href={item.href}
+            onClick={onNavigate}
             title={collapsed ? labels[item.labelKey] : undefined}
             className={cn(
               "relative flex items-center gap-3 rounded-xl py-2.5 text-sm font-medium transition-colors duration-150",

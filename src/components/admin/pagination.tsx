@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -19,7 +20,7 @@ interface PaginationProps {
   pageSizeLabel: string;
 }
 
-export function Pagination({ page, pageSize, total, showingLabel, pageSizeLabel }: PaginationProps) {
+function PaginationInner({ page, pageSize, total, showingLabel, pageSizeLabel }: PaginationProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -77,5 +78,13 @@ export function Pagination({ page, pageSize, total, showingLabel, pageSizeLabel 
         </div>
       </div>
     </div>
+  );
+}
+
+export function Pagination(props: PaginationProps) {
+  return (
+    <Suspense fallback={<div className="h-10" aria-hidden />}>
+      <PaginationInner {...props} />
+    </Suspense>
   );
 }

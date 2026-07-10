@@ -71,11 +71,12 @@ function SidebarPanel({
         )}
       </div>
 
-      <div className="mt-4 flex-1 overflow-y-auto px-3 py-2" onClick={onNavigate}>
+      <div className="mt-4 flex-1 overflow-y-auto px-3 py-2">
         <LearnerSidebarNav
           labels={labels}
           showAdmin={user?.role === "ADMIN"}
           collapsed={collapsed}
+          onNavigate={onNavigate}
         />
       </div>
 

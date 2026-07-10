@@ -141,15 +141,18 @@ export default async function AdminCoursesPage({
               header: tc("actions"),
               cell: (r) => (
                 <div className="flex items-center gap-1">
-                  <Button asChild variant="ghost" size="sm">
-                    <Link href={`/admin/courses/${r.id}`}>
-                      {locale === "fr" ? "Ouvrir" : "Open"}
+                  <Button asChild variant="ghost" size="icon" className="h-9 w-9">
+                    <Link
+                      href={`/admin/courses/${r.id}`}
+                      title={locale === "fr" ? "Ouvrir" : "Open"}
+                      aria-label={locale === "fr" ? "Ouvrir" : "Open"}
+                    >
+                      <MaterialIcon name="open_in_new" size={18} />
                     </Link>
                   </Button>
-                  <Button asChild variant="ghost" size="sm">
-                    <Link href={`/admin/courses?modal=edit&id=${r.id}`}>
+                  <Button asChild variant="ghost" size="icon" className="h-9 w-9">
+                    <Link href={`/admin/courses?modal=edit&id=${r.id}`} title={tc("edit")} aria-label={tc("edit")}>
                       <MaterialIcon name="edit" size={18} />
-                      {tc("edit")}
                     </Link>
                   </Button>
                 </div>

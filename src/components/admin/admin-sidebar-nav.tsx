@@ -28,7 +28,7 @@ export function AdminSidebarNav({
   onNavigate?: () => void;
 }) {
   return (
-    <nav className="space-y-0.5" onClick={onNavigate}>
+    <nav className="space-y-0.5">
       {navItems.map((item) => {
         const isActive =
           currentPath === item.href || (item.href !== "/admin" && currentPath.startsWith(item.href));
@@ -36,6 +36,7 @@ export function AdminSidebarNav({
           <Link
             key={item.href}
             href={item.href}
+            onClick={onNavigate}
             title={collapsed ? labels[item.labelKey] : undefined}
             className={cn(
               "relative flex items-center gap-3 rounded-xl py-2.5 text-sm font-medium transition-colors duration-150",

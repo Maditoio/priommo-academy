@@ -4,6 +4,7 @@ import { updateUserRole } from "@/actions/auth";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { DataTable } from "@/components/admin/data-table";
 import { Pagination } from "@/components/admin/pagination";
+import { MaterialIcon } from "@/components/ui/material-icon";
 import { Button } from "@/components/ui/button";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { format } from "date-fns";
@@ -22,6 +23,7 @@ export default async function AdminUsersPage({
 
   const ta = await getTranslations("admin");
   const te = await getTranslations("exam");
+  const tc = await getTranslations("common");
   const page = Number(sp.page ?? 1);
   const pageSize = Number(sp.pageSize ?? 10);
 
@@ -71,18 +73,32 @@ export default async function AdminUsersPage({
             { key: "date", header: "Joined", cell: (r) => format(r.createdAt, "PP") },
             {
               key: "actions",
-              header: ta("role"),
-              cell: (r) => (
-                <div className="flex gap-1">
-                  {(["LEARNER", "ADMIN", "ORG_ADMIN"] as const).map((role) => (
-                    <form key={role} action={updateUserRole.bind(null, r.id, role)}>
-                      <Button type="submit" variant={r.role === role ? "default" : "ghost"} size="sm">
-                        {role}
-                      </Button>
-                    </form>
-                  ))}
-                </div>
-              ),
+              header: tc("actions"),
+              cell: (r) => {
+                const roleActions = [
+                  { role: "LEARNER" as const, icon: "school", label: "Learner" },
+                  { role: "ADMIN" as const, icon: "admin_panel_settings", label: "Admin" },
+                  { role: "ORG_ADMIN" as const, icon: "corporate_fare", label: "Org admin" },
+                ];
+                return (
+                  <div className="flex gap-1">
+                    {roleActions.map(({ role, icon, label }) => (
+                      <form key={role} action={updateUserRole.bind(null, r.id, role)}>
+                        <Button
+                          type="submit"
+                          variant={r.role === role ? "default" : "ghost"}
+                          size="icon"
+                          className="h-9 w-9"
+                          title={label}
+                          aria-label={label}
+                        >
+                          <MaterialIcon name={icon} size={18} />
+                        </Button>
+                      </form>
+                    ))}
+                  </div>
+                );
+              },
             },
           ]}
           data={users}

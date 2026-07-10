@@ -47,8 +47,15 @@ export function RevokeCertificateButton({
 
   return (
     <>
-      <Button variant="destructive" size="sm" onClick={() => setOpen(true)}>
-        {label}
+      <Button
+        variant="ghost"
+        size="icon"
+        className="h-9 w-9 text-danger hover:text-danger"
+        onClick={() => setOpen(true)}
+        title={label}
+        aria-label={label}
+      >
+        <MaterialIcon name="block" size={18} />
       </Button>
       <FormDialog open={open} onOpenChange={setOpen} title={label}>
         <form onSubmit={handleSubmit} className="flex flex-col">

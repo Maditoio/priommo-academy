@@ -6,6 +6,8 @@ import { Pagination } from "@/components/admin/pagination";
 import { RevokeCertificateButton } from "@/components/admin/revoke-certificate-button";
 import { VerificationSeal, sealStatusFromCertificate } from "@/components/public/verification-seal";
 import { StatusBadge } from "@/components/public/status-badge";
+import { Button } from "@/components/ui/button";
+import { MaterialIcon } from "@/components/ui/material-icon";
 import { Link } from "@/i18n/routing";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { format } from "date-fns";
@@ -25,6 +27,7 @@ export default async function AdminCertificatesPage({
   const ta = await getTranslations("admin");
   const te = await getTranslations("exam");
   const ts = await getTranslations("status");
+  const tc = await getTranslations("common");
   const page = Number(sp.page ?? 1);
   const pageSize = Number(sp.pageSize ?? 10);
 
@@ -85,28 +88,27 @@ export default async function AdminCertificatesPage({
             },
             { key: "date", header: "Issued", cell: (r) => format(r.issuedAt, "PP") },
             {
-              key: "verify",
-              header: "",
-              cell: (r) => (
-                <Link href={`/verify/${r.uniqueCode}`} className="text-sm text-primary hover:underline">
-                  Verify
-                </Link>
-              ),
-            },
-            {
               key: "actions",
-              header: "",
-              cell: (r) =>
-                r.status === "VALID" ? (
-                  <RevokeCertificateButton
-                    id={r.id}
-                    label={ta("revoke")}
-                    locale={locale}
-                    reasonLabel={ta("revokeReason")}
-                    confirmLabel={ta("revoke")}
-                    cancelLabel="Cancel"
-                  />
-                ) : null,
+              header: tc("actions"),
+              cell: (r) => (
+                <div className="flex items-center gap-1">
+                  <Button asChild variant="ghost" size="icon" className="h-9 w-9">
+                    <Link href={`/verify/${r.uniqueCode}`} title="Verify" aria-label="Verify">
+                      <MaterialIcon name="verified" size={18} />
+                    </Link>
+                  </Button>
+                  {r.status === "VALID" && (
+                    <RevokeCertificateButton
+                      id={r.id}
+                      label={ta("revoke")}
+                      locale={locale}
+                      reasonLabel={ta("revokeReason")}
+                      confirmLabel={ta("revoke")}
+                      cancelLabel={tc("cancel")}
+                    />
+                  )}
+                </div>
+              ),
             },
           ]}
           data={certificates}

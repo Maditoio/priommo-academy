@@ -5,6 +5,7 @@ import { DataTable } from "@/components/admin/data-table";
 import { Pagination } from "@/components/admin/pagination";
 import { StatusBadge } from "@/components/public/status-badge";
 import { Button } from "@/components/ui/button";
+import { MaterialIcon } from "@/components/ui/material-icon";
 import { Link } from "@/i18n/routing";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { format } from "date-fns";
@@ -23,6 +24,7 @@ export default async function AdminEnrollmentsPage({
 
   const ta = await getTranslations("admin");
   const te = await getTranslations("exam");
+  const tc = await getTranslations("common");
   const ts = await getTranslations("status");
   const page = Number(sp.page ?? 1);
   const pageSize = Number(sp.pageSize ?? 10);
@@ -74,10 +76,12 @@ export default async function AdminEnrollmentsPage({
             },
             {
               key: "actions",
-              header: "",
+              header: tc("actions"),
               cell: (r) => (
-                <Button asChild variant="ghost" size="sm">
-                  <Link href={`/admin/enrollments/${r.id}`}>View</Link>
+                <Button asChild variant="ghost" size="icon" className="h-9 w-9">
+                  <Link href={`/admin/enrollments/${r.id}`} title="View" aria-label="View">
+                    <MaterialIcon name="visibility" size={18} />
+                  </Link>
                 </Button>
               ),
             },

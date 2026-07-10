@@ -3,7 +3,7 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { createOrganization } from "@/actions/enrollment";
 import { FormActions } from "@/components/admin/form-actions";
-import { FormDialog } from "@/components/admin/form-dialog";
+import { FormSheet } from "@/components/admin/form-sheet";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
@@ -26,14 +26,14 @@ export function OrganizationsAdmin({ locale, labels }: OrganizationsAdminProps) 
   const searchParams = useSearchParams();
   const isOpen = searchParams.get("modal") === "create";
 
-  function closeDialog() {
+  function closeSheet() {
     router.push(`/${locale}/admin/organizations`);
   }
 
   return (
-    <FormDialog
+    <FormSheet
       open={isOpen}
-      onOpenChange={(open) => !open && closeDialog()}
+      onOpenChange={(open) => !open && closeSheet()}
       title={labels.createOrganization}
       description={labels.createOrganizationDesc}
     >
@@ -59,9 +59,9 @@ export function OrganizationsAdmin({ locale, labels }: OrganizationsAdminProps) 
         <FormActions
           submitLabel={labels.save}
           cancelLabel={labels.cancel}
-          onCancel={closeDialog}
+          onCancel={closeSheet}
         />
       </form>
-    </FormDialog>
+    </FormSheet>
   );
 }
