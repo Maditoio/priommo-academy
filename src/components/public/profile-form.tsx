@@ -64,7 +64,7 @@ export function ProfileForm({ locale, user, labels }: ProfileFormProps) {
             <button
               type="button"
               onClick={() => fileRef.current?.click()}
-              className="group relative rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              className="group relative inline-flex h-[120px] w-[120px] shrink-0 items-center justify-center overflow-hidden rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             >
               <UserAvatar src={removePhoto ? null : preview} name={user.name} size={120} />
               <span className="absolute inset-0 flex items-center justify-center rounded-full bg-ink/40 opacity-0 transition-opacity group-hover:opacity-100">

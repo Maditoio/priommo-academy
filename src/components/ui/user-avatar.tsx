@@ -11,23 +11,40 @@ interface UserAvatarProps {
 }
 
 export function UserAvatar({ src, name, size = 48, className }: UserAvatarProps) {
-  const box = cn("overflow-hidden rounded-full bg-accent-soft object-cover", className);
+  const box = cn(
+    "block shrink-0 overflow-hidden rounded-full bg-accent-soft",
+    className
+  );
+  const style = { width: size, height: size, minWidth: size, minHeight: size };
 
   if (src) {
     if (isDataAvatar(src)) {
       return (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={src} alt={name} width={size} height={size} className={box} />
+        <img
+          src={src}
+          alt={name}
+          width={size}
+          height={size}
+          className={cn(box, "object-cover")}
+          style={style}
+        />
       );
     }
-    return <Image src={src} alt={name} width={size} height={size} className={box} />;
+    return (
+      <Image
+        src={src}
+        alt={name}
+        width={size}
+        height={size}
+        className={cn(box, "object-cover")}
+        style={style}
+      />
+    );
   }
 
   return (
-    <div
-      className={cn("flex items-center justify-center", box)}
-      style={{ width: size, height: size }}
-    >
+    <div className={cn("flex items-center justify-center", box)} style={style}>
       <MaterialIcon name="person" className="text-accent" size={Math.round(size * 0.45)} />
     </div>
   );
